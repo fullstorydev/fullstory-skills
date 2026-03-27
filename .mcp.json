@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "fullstory": {
+      "type": "http",
+      "url": "https://api.fullstory.com/mcp/fullstory",
+      "headers": {
+        "Authorization": "Bearer ${FULLSTORY_API_KEY}"
+      }
+    }
+  }
+}

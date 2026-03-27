@@ -1,0 +1,23 @@
+{
+  "name": "fullstory",
+  "version": "0.1.0",
+  "description": "Connect Cursor to Fullstory to query behavioral analytics, session replays, and customer experience insights.",
+  "author": {
+    "name": "Fullstory",
+    "url": "https://www.fullstory.com"
+  },
+  "homepage": "https://www.fullstory.com",
+  "license": "MIT",
+  "keywords": [
+    "analytics",
+    "customer-experience",
+    "behavioral-analytics",
+    "session-replay",
+    "Fullstory",
+    "mcp"
+  ],
+  "logo": "assets/fullstory.svg",
+  "skills": "skills",
+  "agents": "agents",
+  "mcpServers": ".mcp.json"
+}

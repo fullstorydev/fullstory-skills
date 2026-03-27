@@ -1,0 +1,19 @@
+{
+  "name": "fullstory",
+  "version": "0.1.0",
+  "description": "Connect AI agents to Fullstory to query behavioral analytics, session replays, and customer experience insights.",
+  "author": {
+    "name": "Fullstory",
+    "url": "https://www.fullstory.com"
+  },
+  "repository": "https://github.com/fullstorydev/fullstory-mcp",
+  "license": "MIT",
+  "keywords": [
+    "analytics",
+    "customer-experience",
+    "behavioral-analytics",
+    "session-replay",
+    "fullstory",
+    "mcp"
+  ]
+}
