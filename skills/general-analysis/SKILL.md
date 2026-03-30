@@ -32,10 +32,13 @@ If the intent is ambiguous, ask the user before proceeding. Getting the intent w
 
 Users often don't know what metrics or segments already exist in their Fullstory account. Always search first, even when the question sounds ad-hoc. Use `get_metric(regex="...")` or `get_segment(regex="...")`, starting broad and narrowing if needed (e.g., "how many rage clicks on checkout?" → start with `checkout`, then try `checkout.*rage` if the first search returns too many results).
 
-Results include a short description of the segment's filters and events, so use that — not just the name — to judge relevance:
-- If 1–5 results come back and their filters/events match the user's intent, show them with links and ask: "I found these — does one match what you're looking for, or should I build a new one?"
-- If results come back but their filters/events don't match the question, tell the user what you found and that none seem to match, then confirm they'd like you to build a new one.
-- If no results match, tell the user nothing was found and confirm before building.
+Results include a short description of the segment's filters and events, so use that — not just the name — to judge relevance. If no results match, tell the user nothing was found and confirm before building. If results come back but their filters/events don't match the question, tell the user what you found and that none seem to match, then confirm they'd like you to build a new one.
+
+If 2 or more plausible candidates come back, immediately call `get_view_count` on their IDs (up to 10) to rank by popularity. If search returns more than 10 candidates, pass the 10 most name-similar IDs. Then:
+
+- If one candidate has clearly more views (roughly 5x or more than the next), treat it as the canonical object — proceed with it and tell the user you're using "the most-used version."
+- If the top 2–3 are comparable in view count, present them sorted by popularity. Use the filters, events, and description fields from the search results to explain what each one measures or captures differently, then ask the user which to use.
+- If all candidates have zero or near-zero views, flag them as likely stale and offer to build fresh.
 
 ### Building new
 
@@ -76,6 +79,9 @@ Load these when the situation calls for it:
 
 | Tool | Claude Code name |
 |---|---|
+| `get_metric` | `mcp__fullstory-mcp__get_metric` |
+| `get_segment` | `mcp__fullstory-mcp__get_segment` |
+| `get_view_count` | `mcp__fullstory-mcp__get_view_count` |
 | `build_metric` | `mcp__fullstory-mcp__build_metric` |
 | `build_segment` | `mcp__fullstory-mcp__build_segment` |
 | `compute_metric` | `mcp__fullstory-mcp__compute_metric` |
