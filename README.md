@@ -2,6 +2,8 @@
 
 Connect Claude to [Fullstory](https://www.fullstory.com) to query behavioral analytics, session data, and customer experience insights directly from your AI workflows.
 
+**Only available to [Fullstory MCP beta program participants](https://www.fullstory.com/blog/fullstory-mcp/).**
+
 ## What is Fullstory?
 
 Fullstory captures and analyzes digital experience data — session replays, user journeys, rage clicks, errors, and more — to help teams understand how customers interact with their products.
@@ -19,6 +21,8 @@ Available tools are auto-discoverable once the server is connected. See the [Ful
 
 ## Prerequisites
 
+- **A fullstory account that is part of the [Fullstory MCP beta program](https://www.fullstory.com/blog/fullstory-mcp/)**
+- [Claude Code](https://claude.com/product/claude-code) or [Cursor](https://www.cursor.com)
 - A Fullstory account with API access
 - A Fullstory API key (generate one in your Fullstory account settings)
 
@@ -58,9 +62,9 @@ Then restart Claude Code. The Fullstory tools will appear automatically.
 
 ## Configuration
 
-| Variable | Required | Description |
-|---|---|---|
-| `FULLSTORY_API_KEY` | Yes | Your Fullstory API key |
+| Variable            | Required | Description            |
+| ------------------- | -------- | ---------------------- |
+| `FULLSTORY_API_KEY` | Yes      | Your Fullstory API key |
 
 ## Available Tools
 
