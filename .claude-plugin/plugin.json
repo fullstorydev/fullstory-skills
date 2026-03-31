@@ -9,5 +9,5 @@
   "homepage": "https://www.fullstory.com",
   "license": "MIT",
   "keywords": ["analytics", "customer-experience", "behavioral-analytics", "session-replay"],
-  "mcpServers": ".mcp.json"
+  "mcpServers": "./.mcp.json"
 }

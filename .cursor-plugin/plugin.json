@@ -19,5 +19,5 @@
   "logo": "assets/fullstory.svg",
   "skills": "skills",
   "agents": "agents",
-  "mcpServers": ".mcp.json"
+  "mcpServers": "./.mcp.json"
 }
