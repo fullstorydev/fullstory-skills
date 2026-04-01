@@ -16,8 +16,5 @@
     "Fullstory",
     "mcp"
   ],
-  "logo": "assets/fullstory.svg",
-  "skills": "skills",
-  "agents": "agents",
-  "mcpServers": "./.mcp.json"
+  "logo": "assets/fullstory.svg"
 }

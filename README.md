@@ -1,6 +1,6 @@
 # Fullstory MCP Plugin
 
-Connect Claude to [Fullstory](https://www.fullstory.com) to query behavioral analytics, session data, and customer experience insights directly from your AI workflows.
+Connect Claude or Cursor to [Fullstory](https://www.fullstory.com) to query behavioral analytics, session data, and customer experience insights directly from your AI workflows.
 
 **Only available to [Fullstory MCP beta program participants](https://www.fullstory.com/blog/fullstory-mcp/).**
 
@@ -28,43 +28,8 @@ Available tools are auto-discoverable once the server is connected. See the [Ful
 
 ## Setup
 
-### 1. Get your API key
-
-Log in to Fullstory, navigate to **Settings → Integrations → API Keys**, and create a new key.
-
-### 2. Set the environment variable
-
-```bash
-export FULLSTORY_API_KEY=your_api_key_here
-```
-
-For persistent configuration, add this to your shell profile (`~/.zshrc`, `~/.bashrc`, etc.) or your project's `.env` file.
-
-### 3. Add to Claude Code
-
-Add the following to your project's `.mcp.json` (already included if you installed via the marketplace):
-
-```json
-{
-  "mcpServers": {
-    "Fullstory": {
-      "type": "http",
-      "url": "https://api.fullstory.com/mcp/fullstory",
-      "headers": {
-        "Authorization": "Bearer ${FULLSTORY_API_KEY}"
-      }
-    }
-  }
-}
-```
-
-Then restart Claude Code. The Fullstory tools will appear automatically.
-
-## Configuration
-
-| Variable            | Required | Description            |
-| ------------------- | -------- | ---------------------- |
-| `FULLSTORY_API_KEY` | Yes      | Your Fullstory API key |
+- [Claude Code](https://developer.fullstory.com/mcp/client-setup/claude-code/)
+- [Cursor](https://developer.fullstory.com/mcp/client-setup/cursor/)
 
 ## Available Tools
 
