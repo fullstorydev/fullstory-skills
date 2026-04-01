@@ -3,10 +3,14 @@
   "owner": {
     "name": "Fullstory Inc"
   },
+  "metadata": {
+    "description": "Fullstory behavioral analytics, session context, and MCP integration for Claude Code."
+  },
   "plugins": [
     {
       "name": "Fullstory",
-      "source": "./",
+      "version": "0.1.0",
+      "source": "./plugins/fullstory",
       "description": "Connect Claude to Fullstory to query behavioral analytics, session replays, and customer experience insights."
     }
   ]
