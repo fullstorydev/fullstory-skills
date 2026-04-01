@@ -24,7 +24,7 @@ If a trend shows a sharp drop to zero mid-period or a sudden spike that doesn't 
 
 ## When the user expresses skepticism
 
-If the user says "that doesn't seem right," slice by dimension. Rebuild the same metric as `top_n` with a meaningful dimension (page, browser, device) to see the distribution. This either confirms the number or reveals where the data is actually concentrated.
+If the user says "that doesn't seem right," slice by dimension. Call `update_metric` with the existing `metric_definition` and a refinement like "change to top_n grouped by page" to see the distribution. This either confirms the number or reveals where the data is actually concentrated.
 
 ## Presenting validation
 

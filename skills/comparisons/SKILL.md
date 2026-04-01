@@ -14,6 +14,8 @@ If the comparison axis describes the context of an individual event at the momen
 
 Example: "rage clicks on mobile vs desktop" → `build_metric(query="rage clicks by device type", output_type="top_n")`. The result table shows mobile and desktop as separate rows.
 
+To refine an established comparison metric (e.g., "add a Chrome-only filter"), pass its `metric_definition` to `update_metric` with a refinement instruction rather than rebuilding.
+
 **Do not use segments for event properties.** Building a "mobile users" segment and a "desktop users" segment would assign all of a user's rage clicks to whichever device they ever used — even clicks that happened on the other device.
 
 ## User-level properties → separate segments
@@ -23,6 +25,8 @@ Properties that describe a user rather than an event should use segments. The ke
 Built-in user properties that work this way: `signed_up` (signed-up status), `first_seen` / `last_seen` (dates), `total_sessions` (engagement depth), and any custom user properties (`user_var_string`, `user_var_int`, etc.) set via `setUserProperties` — e.g. plan type or account ID. Build one metric and one segment per cohort, then call `compute_metric` once per segment with the same `metric_definition` but a different `segment_id`. Present the results side by side.
 
 Example: "do enterprise users experience more errors than free users?" → build two segments (enterprise, free), build one metric (errors), compute twice.
+
+To refine a cohort after it's been built (e.g., "also exclude trial users from the free segment"), use `update_segment` with the existing `segment_definition` rather than rebuilding with `build_segment`.
 
 Using `top_n` dimensionality for user properties is valid if you specifically want point-in-time values — each event is attributed to the user property value at the moment it fired. If a user changed plan tier mid-period, their events will be split across both values. For most comparisons you want the canonical (current) value, which is why segments are the default choice.
 
