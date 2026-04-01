@@ -2,7 +2,7 @@
 
 Connect Claude or Cursor to [Fullstory](https://www.fullstory.com) to query behavioral analytics, session data, and customer experience insights directly from your AI workflows.
 
-**Only available to [Fullstory MCP beta program participants](https://www.fullstory.com/blog/fullstory-mcp/).**
+**Only available to [Fullstory MCP beta program participants](https://www.fullstory.com/platform/mcp/).**
 
 ## What is Fullstory?
 
