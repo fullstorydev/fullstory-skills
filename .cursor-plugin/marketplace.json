@@ -11,7 +11,7 @@
   "plugins": [
     {
       "name": "Fullstory",
-      "source": "./plugins/fullstory",
+      "source": "fullstory",
       "description": "Connect Cursor to Fullstory to query behavioral analytics, session replays, and customer experience insights."
     }
   ]
