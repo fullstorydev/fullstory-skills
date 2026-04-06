@@ -14,7 +14,7 @@ If the comparison axis describes the context of an individual event at the momen
 
 Example: "rage clicks on mobile vs desktop" → `build_metric(query="rage clicks by device type", output_type="top_n")`. The result table shows mobile and desktop as separate rows.
 
-To refine an established comparison metric (e.g., "add a Chrome-only filter"), pass its `metric_definition` to `update_metric` with a refinement instruction rather than rebuilding.
+To refine an established comparison metric (e.g., "add a Chrome-only filter"), pass its `metric_id` to `update_metric` with a refinement instruction rather than rebuilding.
 
 **Do not use segments for event properties.** Building a "mobile users" segment and a "desktop users" segment would assign all of a user's rage clicks to whichever device they ever used — even clicks that happened on the other device.
 
@@ -22,7 +22,7 @@ To refine an established comparison metric (e.g., "add a Chrome-only filter"), p
 
 Properties that describe a user rather than an event should use segments. The key mechanism: Fullstory resolves user properties to the user's **last known value** for that key. This canonical value is what segment queries match against — so you're asking "what bucket is this user in now?", not "what was their value at the moment of each event?".
 
-Built-in user properties that work this way: `signed_up` (signed-up status), `first_seen` / `last_seen` (dates), `total_sessions` (engagement depth), and any custom user properties (`user_var_string`, `user_var_int`, etc.) set via `setUserProperties` — e.g. plan type or account ID. Build one metric and one segment per cohort, then call `compute_metric` once per segment with the same `metric_definition` but a different `segment_id`. Present the results side by side.
+Built-in user properties that work this way: `signed_up` (signed-up status), `first_seen` / `last_seen` (dates), `total_sessions` (engagement depth), and any custom user properties (`user_var_string`, `user_var_int`, etc.) set via `setUserProperties` — e.g. plan type or account ID. Build one metric and one segment per cohort, then compute each cohort in sequence: attach the segment via `update_metric(metric_id, segment_id)`, call `compute_metric(metric_id)`, store the result, then repeat with the next segment. Present the results side by side. Do not pass `segment_id` directly to `compute_metric`.
 
 Example: "do enterprise users experience more errors than free users?" → build two segments (enterprise, free), build one metric (errors), compute twice.
 
