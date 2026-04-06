@@ -56,17 +56,18 @@ For `top_n`, make sure the grouping dimension is expressed in the query (e.g., "
 
 ### Refining existing
 
-If the user wants to modify a metric or segment already established in this conversation — adding or removing a filter, changing aggregation, adjusting the time range, or changing output shape — use `update_metric` or `update_segment`. Pass the existing `metric_definition` or `segment_definition` and a natural language `refinement`.
+If the user wants to modify a metric or segment already established in this conversation — adding or removing a filter, changing aggregation, adjusting the time range, or changing output shape — use `update_metric` or `update_segment`. Pass the existing `metric_id` or `segment_definition` and a natural language `refinement`.
 
-- `update_metric`: supports filter changes, aggregation changes, and output type overrides (via `output_type`). Does not support ratio metrics — rebuild those with `build_metric`.
+- `update_metric`: accepts `metric_id` and supports two mutually exclusive modes: LLM refinement (filter changes, aggregation changes, output type overrides via `output_type`) and segment attachment (attach a `segment_id` to the metric). Does not support ratio metrics — rebuild those with `build_metric`.
 - `update_segment`: supports filter additions/removals and time range changes.
 
 ## Step 2: Compute
 
 Call `compute_metric` with:
-- `metric_definition` from build or get
-- `segment_id` if the question is scoped to a cohort
+- `metric_id` — the ID returned by `build_metric`, `get_metric`, or `update_metric`
 - `time_range` — default is `last_30_days`; ask the user if they want a different window
+
+If the question is scoped to a cohort, segments must be pre-attached before computing. Call `update_metric(metric_id, segment_id)` first, then call `compute_metric(metric_id)`. Do not pass `segment_id` directly to `compute_metric`.
 
 Present results in plain language with context:
 - Numbers: "12,340 dead clicks over the last 30 days"
@@ -102,6 +103,6 @@ Load these when the situation calls for it:
 - Default `time_range` is `last_30_days`. Ask before using a different window unless the user specified one.
 - When building a segment for use in a later step, always reference by `segment_id`.
 - Reuse `segment_id` and `metric_id` within a conversation. Do not rebuild objects the user has already established.
-- If the user asks for a different shape of an existing metric (e.g., they have a count but now want a trend), call `update_metric` with the existing `metric_definition` and the desired `output_type`. Only fall back to `build_metric` for fundamentally different queries or ratio metrics.
+- If the user asks for a different shape of an existing metric (e.g., they have a count but now want a trend), call `update_metric` with the existing `metric_id` and the desired `output_type`. Only fall back to `build_metric` for fundamentally different queries or ratio metrics.
 - When presenting table results, include both the dimension value and the count. If a total is available, show percentages.
-- Always surface `metric_url` in your response so the user can verify in the Fullstory UI.
+- Always surface `metric_url` in your response so the user can verify in the Fullstory UI. `build_metric` and `update_metric` both return `metric_url` — surface it as soon as it's available, don't wait until after computing.
