@@ -1,6 +1,6 @@
 {
   "mcpServers": {
-    "Fullstory": {
+    "fullstory": {
       "type": "http",
       "url": "https://api.fullstory.com/mcp/fullstory"
     }

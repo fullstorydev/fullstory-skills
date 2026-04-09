@@ -1,5 +1,5 @@
 {
-  "name": "Fullstory",
+  "name": "fullstory",
   "version": "0.1.0",
   "description": "Connect Cursor to Fullstory to query behavioral analytics, session replays, and customer experience insights.",
   "author": {

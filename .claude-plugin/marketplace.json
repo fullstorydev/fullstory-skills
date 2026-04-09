@@ -1,5 +1,5 @@
 {
-  "name": "Fullstory",
+  "name": "fullstory",
   "owner": {
     "name": "Fullstory Inc"
   },
@@ -8,7 +8,7 @@
   },
   "plugins": [
     {
-      "name": "Fullstory",
+      "name": "fullstory",
       "version": "0.1.0",
       "source": "./plugins/fullstory",
       "description": "Connect Claude to Fullstory to query behavioral analytics, session replays, and customer experience insights."
