@@ -10,7 +10,7 @@
     {
       "name": "fullstory",
       "version": "0.1.0",
-      "source": "./plugins/fullstory",
+      "source": "./",
       "description": "Connect Claude to Fullstory to query behavioral analytics, session replays, and customer experience insights."
     }
   ]

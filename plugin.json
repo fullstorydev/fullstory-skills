@@ -1,0 +1,16 @@
+{
+  "name": "fullstory",
+  "version": "0.1.0",
+  "description": "Connect VSCode to Fullstory to query behavioral analytics, session replays, and customer experience insights.",
+  "author": {
+    "name": "Fullstory"
+  },
+  "homepage": "https://www.fullstory.com",
+  "license": "MIT",
+  "keywords": [
+    "analytics",
+    "customer-experience",
+    "behavioral-analytics",
+    "session-replay"
+  ]
+}
