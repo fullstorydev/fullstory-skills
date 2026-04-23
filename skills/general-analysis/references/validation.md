@@ -4,7 +4,7 @@ Not every result needs validation. Validate when the result is zero, looks anoma
 
 ## Zero results — always validate
 
-Zero is never confidently correct without a cross-check. When `compute_metric` returns zero:
+Zero is never confidently correct without a cross-check. When `fullstory:compute_metric` returns zero:
 
 1. Broaden scope: recompute the same event type without page/element filters. If the broader query returns data, the filter was wrong — tell the user what the data actually shows.
 2. Expand time range: try `last_30_days` or `last_90_days`. If data appears in a longer window, the event exists but not in the requested period — report that.
@@ -24,7 +24,7 @@ If a trend shows a sharp drop to zero mid-period or a sudden spike that doesn't 
 
 ## When the user expresses skepticism
 
-If the user says "that doesn't seem right," slice by dimension. Call `update_metric` with the existing `metric_id` and a refinement like "change to top_n grouped by page" to see the distribution. This either confirms the number or reveals where the data is actually concentrated.
+If the user says "that doesn't seem right," slice by dimension. Call `fullstory:update_metric` with the existing `metric_id` and a refinement like "change to top_n grouped by page" to see the distribution. This either confirms the number or reveals where the data is actually concentrated.
 
 ## Presenting validation
 
