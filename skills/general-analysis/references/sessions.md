@@ -8,13 +8,13 @@ Sessions answer "why", not "how many." Use them when:
 
 ## Read sessions in an isolated context
 
-Never call `get_session_events` directly in the main conversation. Session transcripts are large and will bloat the context window. Instead, load each session in an isolated context — use a subagent, Task tool, or whatever mechanism your environment provides for spawning a child context with its own window. See `agents/session-context.md`.
+Never call `fullstory:get_session_events` directly in the main conversation. Session transcripts are large and will bloat the context window. Instead, load each session in an isolated context — use a subagent, Task tool, or whatever mechanism your environment provides for spawning a child context with its own window. See `agents/session-context.md`.
 
 Pass three things to the isolated context:
-- `device_id` and `session_id` from the `get_sessions` result
+- `device_id` and `session_id` from the `fullstory:get_sessions` result
 - A task describing what you want to learn from the session
 
-The isolated context should call `get_session_events`, answer the task, and return what it found. You synthesize across sessions in the main context.
+The isolated context should call `fullstory:get_session_events`, answer the task, and return what it found. You synthesize across sessions in the main context.
 
 **More specific tasks get more useful answers.** When you have a hypothesis, tie the task to it:
 
@@ -26,7 +26,7 @@ The isolated context should call `get_session_events`, answer the task, and retu
 
 ## Workflow
 
-1. Call `get_sessions` with `metric_id` (or `segment_id` for cohort browsing) to get 3–5 sessions
+1. Call `fullstory:get_sessions` with `metric_id` (or `segment_id` for cohort browsing) to get 3–5 sessions
 2. For each session, load it in an isolated context with `device_id`, `session_id`, and a task
 3. Look for patterns across the responses: same page, same element, same error, same flow sequence
 4. Synthesize a conclusion: "Rage clicks on checkout are concentrated on the 'Apply Coupon' button — in 4 of 5 sessions, users clicked it repeatedly with no visible response"
@@ -34,9 +34,3 @@ The isolated context should call `get_session_events`, answer the task, and retu
 
 Start with 3–5 sessions. If the pattern is clear, stop. If not, pull more — isolated contexts mean additional sessions don't cost main context space. Use your judgment on when you have enough evidence.
 
-## Tool Names
-
-| Tool | Claude Code name |
-|---|---|
-| `get_sessions` | `mcp__fullstory-mcp__get_sessions` |
-| `get_session_events` | `mcp__fullstory-mcp__get_session_events` |

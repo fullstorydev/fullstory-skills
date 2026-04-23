@@ -21,8 +21,8 @@ Before calling any tool, determine what the user is asking for:
 - "which pages", "top N", "by browser", "breakdown by" → breakdown → `top_n` metric
 - "over time", "by day", "is it getting worse", "trend" → trend → `trend` metric
 - "mobile vs desktop", "compare", "A vs B" → comparison → invoke the `comparisons` skill
-- "show me sessions", "let me watch", "examples of" → session exploration → `get_sessions` with `metric_id`
-- "sessions from power users", "show me what enterprise users do" → cohort browsing → `build_segment` then `get_sessions` with `segment_id`
+- "show me sessions", "let me watch", "examples of" → session exploration → `fullstory:get_sessions` with `metric_id`
+- "sessions from power users", "show me what enterprise users do" → cohort browsing → `fullstory:build_segment` then `fullstory:get_sessions` with `segment_id`
 
 If the intent is ambiguous, ask the user before proceeding. Getting the intent wrong wastes a build+compute cycle.
 
@@ -30,11 +30,11 @@ If the intent is ambiguous, ask the user before proceeding. Getting the intent w
 
 ### Always search before building
 
-Users often don't know what metrics or segments already exist in their Fullstory account. Always search first, even when the question sounds ad-hoc. Use `get_metric(regex="...")` or `get_segment(regex="...")`, starting broad and narrowing if needed (e.g., "how many rage clicks on checkout?" → start with `checkout`, then try `checkout.*rage` if the first search returns too many results).
+Users often don't know what metrics or segments already exist in their Fullstory account. Always search first, even when the question sounds ad-hoc. Use `fullstory:get_metric(regex="...")` or `fullstory:get_segment(regex="...")`, starting broad and narrowing if needed (e.g., "how many rage clicks on checkout?" → start with `checkout`, then try `checkout.*rage` if the first search returns too many results).
 
 Results include a short description of the segment's filters and events, so use that — not just the name — to judge relevance. If no results match, tell the user nothing was found and confirm before building. If results come back but their filters/events don't match the question, tell the user what you found and that none seem to match, then confirm they'd like you to build a new one.
 
-If 2 or more plausible candidates come back, immediately call `get_view_count` on their IDs (up to 10) to rank by popularity. If search returns more than 10 candidates, pass the 10 most name-similar IDs. Then:
+If 2 or more plausible candidates come back, immediately call `fullstory:get_view_count` on their IDs (up to 10) to rank by popularity. If search returns more than 10 candidates, pass the 10 most name-similar IDs. Then:
 
 - If one candidate has clearly more views (roughly 5x or more than the next), treat it as the canonical object — proceed with it and tell the user you're using "the most-used version."
 - If the top 2–3 are comparable in view count, present them sorted by popularity. Use the filters, events, and description fields from the search results to explain what each one measures or captures differently, then ask the user which to use.
@@ -44,7 +44,7 @@ If 2 or more plausible candidates come back, immediately call `get_view_count` o
 
 **Metrics:** Before building, make sure the unit of measurement is correct — getting this wrong is the most common source of misleading results. If the question is about "customers", "accounts", or "organizations", clarify whether the user wants to count individual users or group users by a customer/account/organization property. If it's the latter, look for user properties that match and build the metric to count by that property. Similarly, watch for ambiguity between pages and URLs — "which pages" usually means page titles or paths, not full URLs with query parameters.
 
-Call `build_metric` with a descriptive query and the correct `output_type` derived from intent classification:
+Call `fullstory:build_metric` with a descriptive query and the correct `output_type` derived from intent classification:
 
 - Quantitative answer → `single_number`
 - Breakdown → `top_n`
@@ -52,22 +52,22 @@ Call `build_metric` with a descriptive query and the correct `output_type` deriv
 
 For `top_n`, make sure the grouping dimension is expressed in the query (e.g., "top pages by rage click count"). The metric builder will not invent a dimension on its own.
 
-**Segments:** Call `build_segment`. Always reference by `segment_id` in subsequent steps. If the same cohort is needed for multiple questions in the conversation, reuse the existing `segment_id` — do not rebuild.
+**Segments:** Call `fullstory:build_segment`. Always reference by `segment_id` in subsequent steps. If the same cohort is needed for multiple questions in the conversation, reuse the existing `segment_id` — do not rebuild.
 
 ### Refining existing
 
-If the user wants to modify a metric or segment already established in this conversation — adding or removing a filter, changing aggregation, adjusting the time range, or changing output shape — use `update_metric` or `update_segment`. Pass the existing `metric_id` or `segment_definition` and a natural language `refinement`.
+If the user wants to modify a metric or segment already established in this conversation — adding or removing a filter, changing aggregation, adjusting the time range, or changing output shape — use `fullstory:update_metric` or `fullstory:update_segment`. Pass the existing `metric_id` or `segment_definition` and a natural language `refinement`.
 
-- `update_metric`: accepts `metric_id` and supports two mutually exclusive modes: LLM refinement (filter changes, aggregation changes, output type overrides via `output_type`) and segment attachment (attach a `segment_id` to the metric). Does not support ratio metrics — rebuild those with `build_metric`.
-- `update_segment`: supports filter additions/removals and time range changes.
+- `fullstory:update_metric`: accepts `metric_id` and supports two mutually exclusive modes: LLM refinement (filter changes, aggregation changes, output type overrides via `output_type`) and segment attachment (attach a `segment_id` to the metric). Does not support ratio metrics — rebuild those with `fullstory:build_metric`.
+- `fullstory:update_segment`: supports filter additions/removals and time range changes.
 
 ## Step 2: Compute
 
-Call `compute_metric` with:
-- `metric_id` — the ID returned by `build_metric`, `get_metric`, or `update_metric`
+Call `fullstory:compute_metric` with:
+- `metric_id` — the ID returned by `fullstory:build_metric`, `fullstory:get_metric`, or `fullstory:update_metric`
 - `time_range` — default is `last_30_days`; ask the user if they want a different window
 
-If the question is scoped to a cohort, segments must be pre-attached before computing. Call `update_metric(metric_id, segment_id)` first, then call `compute_metric(metric_id)`. Do not pass `segment_id` directly to `compute_metric`.
+If the question is scoped to a cohort, segments must be pre-attached before computing. Call `fullstory:update_metric(metric_id, segment_id)` first, then call `fullstory:compute_metric(metric_id)`. Do not pass `segment_id` directly to `fullstory:compute_metric`.
 
 Present results in plain language with context:
 - Numbers: "12,340 dead clicks over the last 30 days"
@@ -83,26 +83,11 @@ Load these when the situation calls for it:
 - `references/validation.md` — when results are zero, anomalous, or the user expresses skepticism
 - `references/sessions.md` — when investigating sessions to understand why a metric looks the way it does
 
-## Tool Names
-
-| Tool | Claude Code name |
-|---|---|
-| `get_metric` | `mcp__fullstory-mcp__get_metric` |
-| `get_segment` | `mcp__fullstory-mcp__get_segment` |
-| `get_view_count` | `mcp__fullstory-mcp__get_view_count` |
-| `build_metric` | `mcp__fullstory-mcp__build_metric` |
-| `build_segment` | `mcp__fullstory-mcp__build_segment` |
-| `compute_metric` | `mcp__fullstory-mcp__compute_metric` |
-| `update_metric` | `mcp__fullstory-mcp__update_metric` |
-| `update_segment` | `mcp__fullstory-mcp__update_segment` |
-| `get_sessions` | `mcp__fullstory-mcp__get_sessions` |
-| `get_session_events` | `mcp__fullstory-mcp__get_session_events` |
-
 ## Guidelines
 
 - Default `time_range` is `last_30_days`. Ask before using a different window unless the user specified one.
 - When building a segment for use in a later step, always reference by `segment_id`.
 - Reuse `segment_id` and `metric_id` within a conversation. Do not rebuild objects the user has already established.
-- If the user asks for a different shape of an existing metric (e.g., they have a count but now want a trend), call `update_metric` with the existing `metric_id` and the desired `output_type`. Only fall back to `build_metric` for fundamentally different queries or ratio metrics.
+- If the user asks for a different shape of an existing metric (e.g., they have a count but now want a trend), call `fullstory:update_metric` with the existing `metric_id` and the desired `output_type`. Only fall back to `fullstory:build_metric` for fundamentally different queries or ratio metrics.
 - When presenting table results, include both the dimension value and the count. If a total is available, show percentages.
-- Always surface `metric_url` in your response so the user can verify in the Fullstory UI. `build_metric` and `update_metric` both return `metric_url` — surface it as soon as it's available, don't wait until after computing.
+- Always surface `metric_url` in your response so the user can verify in the Fullstory UI. `fullstory:build_metric` and `fullstory:update_metric` both return `metric_url` — surface it as soon as it's available, don't wait until after computing.

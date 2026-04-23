@@ -12,9 +12,9 @@ When the user asks to compare A vs B, the right mechanism depends on what the co
 
 If the comparison axis describes the context of an individual event at the moment it fired — not the user who triggered it — use dimensionality. Common examples: device type, browser, OS, page URL, element. But the rule is the principle, not the list: if the property travels with the event, not the user, it belongs here. Express it as a single `top_n` metric with the comparison axis as the grouping dimension.
 
-Example: "rage clicks on mobile vs desktop" → `build_metric(query="rage clicks by device type", output_type="top_n")`. The result table shows mobile and desktop as separate rows.
+Example: "rage clicks on mobile vs desktop" → `fullstory:build_metric(query="rage clicks by device type", output_type="top_n")`. The result table shows mobile and desktop as separate rows.
 
-To refine an established comparison metric (e.g., "add a Chrome-only filter"), pass its `metric_id` to `update_metric` with a refinement instruction rather than rebuilding.
+To refine an established comparison metric (e.g., "add a Chrome-only filter"), pass its `metric_id` to `fullstory:update_metric` with a refinement instruction rather than rebuilding.
 
 **Do not use segments for event properties.** Building a "mobile users" segment and a "desktop users" segment would assign all of a user's rage clicks to whichever device they ever used — even clicks that happened on the other device.
 
@@ -22,11 +22,11 @@ To refine an established comparison metric (e.g., "add a Chrome-only filter"), p
 
 Properties that describe a user rather than an event should use segments. The key mechanism: Fullstory resolves user properties to the user's **last known value** for that key. This canonical value is what segment queries match against — so you're asking "what bucket is this user in now?", not "what was their value at the moment of each event?".
 
-Built-in user properties that work this way: `signed_up` (signed-up status), `first_seen` / `last_seen` (dates), `total_sessions` (engagement depth), and any custom user properties (`user_var_string`, `user_var_int`, etc.) set via `setUserProperties` — e.g. plan type or account ID. Build one metric and one segment per cohort, then compute each cohort in sequence: attach the segment via `update_metric(metric_id, segment_id)`, call `compute_metric(metric_id)`, store the result, then repeat with the next segment. Present the results side by side. Do not pass `segment_id` directly to `compute_metric`.
+Built-in user properties that work this way: `signed_up` (signed-up status), `first_seen` / `last_seen` (dates), `total_sessions` (engagement depth), and any custom user properties (`user_var_string`, `user_var_int`, etc.) set via `setUserProperties` — e.g. plan type or account ID. Build one metric and one segment per cohort, then compute each cohort in sequence: attach the segment via `fullstory:update_metric(metric_id, segment_id)`, call `fullstory:compute_metric(metric_id)`, store the result, then repeat with the next segment. Present the results side by side. Do not pass `segment_id` directly to `fullstory:compute_metric`.
 
 Example: "do enterprise users experience more errors than free users?" → build two segments (enterprise, free), build one metric (errors), compute twice.
 
-To refine a cohort after it's been built (e.g., "also exclude trial users from the free segment"), use `update_segment` with the existing `segment_definition` rather than rebuilding with `build_segment`.
+To refine a cohort after it's been built (e.g., "also exclude trial users from the free segment"), use `fullstory:update_segment` with the existing `segment_definition` rather than rebuilding with `fullstory:build_segment`.
 
 Using `top_n` dimensionality for user properties is valid if you specifically want point-in-time values — each event is attributed to the user property value at the moment it fired. If a user changed plan tier mid-period, their events will be split across both values. For most comparisons you want the canonical (current) value, which is why segments are the default choice.
 
