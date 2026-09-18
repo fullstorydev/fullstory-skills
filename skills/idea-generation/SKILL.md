@@ -68,15 +68,15 @@ Then compute and look for one of these:
 
 **Qualify before sizing.** Drop anything failing interesting, actionable or sizeable, then check it against the already-known list and against `fullstory:get_opportunities` — what Fullstory has already ranked is on the team's radar by definition, so it confirms and sizes rather than becoming a proposal.
 
-**Some of these tools may not be available in your org, and the signal is absence, not an error.** `fullstory:get_opportunities`, `fullstory:get_opportunity`, `fullstory:get_pages` and `fullstory:get_managed_funnels` are not present for every org. Where they are unavailable they are filtered out of the tool list entirely, so you never see them rather than get an error or an empty result. Check what you actually have before planning around them, and note that this costs you `get_managed_funnels`, which the object search above leans on — fall back to `fullstory:get_metric` and `fullstory:get_segment` by regex plus the funnels the user names. `fullstory:discover_groups`, `fullstory:get_opportunity_stats` and `fullstory:get_sessions_for_opportunity` are always present; they compute from recorded data at call time and work wherever there is traffic, so when the others are missing these are the whole lead layer and the run loses only the pre-ranked list.
+**Some of these tools may not be available in your org, and the signal is absence, not an error.** `fullstory:get_opportunities`, `fullstory:get_opportunity`, `fullstory:get_pages` and `fullstory:get_managed_funnels` are not present for every org. Where they are unavailable they are filtered out of the tool list entirely, so you never see them rather than get an error or an empty result. Check what you actually have before planning around them, and note that this costs you `fullstory:get_managed_funnels`, which the object search above leans on — fall back to `fullstory:get_metric` and `fullstory:get_segment` by regex plus the funnels the user names. `fullstory:discover_groups`, `fullstory:get_opportunity_stats` and `fullstory:get_sessions_for_opportunity` are always present; they compute from recorded data at call time and work wherever there is traffic, so when the others are missing these are the whole lead layer and the run loses only the pre-ranked list.
 
-**An empty result is a different thing from a missing tool.** If `get_opportunities` is present and returns nothing, that is an org with nothing stored rather than an org that does not have the tool, which also silently weakens the already-known check above. Say which case you were in.
+**An empty result is a different thing from a missing tool.** If `fullstory:get_opportunities` is present and returns nothing, that is an org with nothing stored rather than an org that does not have the tool, which also silently weakens the already-known check above. Say which case you were in.
 
 **If a cohort is defined by exclusion, validate it.** "Did not convert" leaks, because products usually offer several routes to one outcome and the segment excludes one. Sample 8 to 10 sessions and check whether the outcome happened anyway by any route; above roughly 10%, fix the definition. Exclude the confirmation the user actually *sees*, in every locale and variant, rather than one named event or element. Relaxing a scope filter for volume is fine and gets logged; relaxing the filter that *defines* the cohort changes the question and goes to the user.
 
 ## Phase 3: Size, Then Support
 
-`fullstory:get_opportunity_stats` computes fresh statistics from a `discover_groups` tuple: `users_affected`, `session_count`, `user_percentage`, and page, device and domain breakdowns. Prefer `user_percentage_on_page` — the share of users *on that page* — over `user_percentage`, which flatters a problem on a low-traffic page. `frustration_rate_change` and `error_rate_change` compare affected users against unaffected ones, which is a contrast needing no second cohort. For a lead from a funnel or metric, size it with `fullstory:compute_funnel` or `fullstory:compute_metric` instead.
+`fullstory:get_opportunity_stats` computes fresh statistics from a `fullstory:discover_groups` tuple: `users_affected`, `session_count`, `user_percentage`, and page, device and domain breakdowns. Prefer `user_percentage_on_page` — the share of users *on that page* — over `user_percentage`, which flatters a problem on a low-traffic page. `frustration_rate_change` and `error_rate_change` compare affected users against unaffected ones, which is a contrast needing no second cohort. For a lead from a funnel or metric, size it with `fullstory:compute_funnel` or `fullstory:compute_metric` instead.
 
 **Every number carries its denominator and window into the output.** A number nobody can re-derive is not evidence, and one a second run would contradict is worse than none.
 
@@ -96,7 +96,7 @@ If a finalist's replays show a different mechanism than the number implied, that
 
 Four checks, run by reading your own list. Report the drop counts in caveats, not the body.
 
-- **Already known.** Match every candidate against the Phase 1 list and everything `get_opportunities` surfaced, and drop any hit. If it shipped and is still happening, name it a regression.
+- **Already known.** Match every candidate against the Phase 1 list and everything `fullstory:get_opportunities` surfaced, and drop any hit. If it shipped and is still happening, name it a regression.
 - **Evidence.** Every proposal carries at least one replay link from this run, never recalled or constructed. A full proposal needs two independent sources — a computed object is one, an Opportunity or replays or a support theme or a prior run is another. Single-source patterns go to **Emerging Signals**, not the bin.
 - **Comparison.** A number with nothing beside it is not a finding. If nothing sits beside it yet, go compute a fair baseline before ranking it. Then rule out a partial window read as a trend, seasonality, a launch or ramp effect, bots, and too small a sample.
 - **Novelty.** Write the one-line *why it's new*: what this says that their metrics, dashboards and backlog do not. If the answer is nothing, it is an observation, so cut it or drop it to one line in Emerging Signals.
@@ -131,15 +131,15 @@ Verified behaviours that cost a run when missed.
 
 | | |
 |---|---|
-| `discover_groups` tuple | Returns `(default_metric_id, group_id, group_id_fallback)`. Carry all three; dropping the fallback boolean silently mismatches the group. |
-| Scope consistency | `get_opportunity_stats` and `get_sessions_for_opportunity` both take `scope`. Pass the one you gave `discover_groups`, or the stats describe the whole org. |
+| `fullstory:discover_groups` tuple | Returns `(default_metric_id, group_id, group_id_fallback)`. Carry all three; dropping the fallback boolean silently mismatches the group. |
+| Scope consistency | `fullstory:get_opportunity_stats` and `fullstory:get_sessions_for_opportunity` both take `scope`. Pass the one you gave `fullstory:discover_groups`, or the stats describe the whole org. |
 | Percentages do not match | `discover_groups.user_pct` is a share of the scope you queried; `user_percentage_on_page` is a share of the page's traffic. Say which denominator each number uses. |
-| Which tools are always there | `get_opportunities`, `get_opportunity`, `get_pages` and `get_managed_funnels` are not present for every org, and where they are absent they are hidden from the tool list rather than erroring. `discover_groups`, `get_opportunity_stats` and `get_sessions_for_opportunity` are always available. |
-| `get_opportunities` percentages | `user_percentage` and `event_percentage` populate only on the segment-scoped path, returning zero elsewhere, and even then they are org-wide shares. Never report "0% affected". |
-| `get_sessions_for_opportunity` defaults | `limit` 10 (max 50), window 24 hours. Set both to match the run. |
+| Which tools are always there | `fullstory:get_opportunities`, `fullstory:get_opportunity`, `fullstory:get_pages` and `fullstory:get_managed_funnels` are not present for every org, and where they are absent they are hidden from the tool list rather than erroring. `fullstory:discover_groups`, `fullstory:get_opportunity_stats` and `fullstory:get_sessions_for_opportunity` are always available. |
+| `fullstory:get_opportunities` percentages | `user_percentage` and `event_percentage` populate only on the segment-scoped path, returning zero elsewhere, and even then they are org-wide shares. Never report "0% affected". |
+| `fullstory:get_sessions_for_opportunity` defaults | `limit` 10 (max 50), window 24 hours. Set both to match the run. |
 | `dropout_at_step` | Lives in `scope`. 0 is the default and means the LAST step, a full dropout, not the first. |
 | `compare_to_previous` | `comparison_mode` picks `worsening` (default) or `improving`. Check the prior window returns non-zero before trusting any delta. |
-| `metric_ids` | Narrows `discover_groups` to specific signals out of the nine standard ones, which stops an error-heavy surface crowding out interaction signals. |
+| `metric_ids` | Narrows `fullstory:discover_groups` to specific signals out of the nine standard ones, which stops an error-heavy surface crowding out interaction signals. |
 | Instance ids | A record's `insight_instance_id` is a different identifier than the `instance_id` you looked it up with. |
 | Drafts | Objects built through the MCP return unsaved `/create/` URLs, so save and name anything you link to. |
 
@@ -162,5 +162,5 @@ Verified behaviours that cost a run when missed.
 | Reading zero frustration signals as "nothing is wrong" | On a low-activity cohort that is guaranteed by arithmetic. Report the interaction count next to the claim. |
 | Letting a monitoring tab or scraper into a small cohort | It will own the dwell times. Check the long sessions before trusting an average. |
 | A headline figure with no denominator, definition or comparison | The lead number needs these most, and needs to appear in the body, not only the summary. |
-| Assuming the Opportunity tools are there | Four of them are absent in some orgs, `get_managed_funnels` among them, and they vanish from the tool list rather than erroring. Check what you have before planning the sweep around it. |
+| Assuming the Opportunity tools are there | Four of them are absent in some orgs, `fullstory:get_managed_funnels` among them, and they vanish from the tool list rather than erroring. Check what you have before planning the sweep around it. |
 | Surfacing refreshes and scroll depth as findings | Apply the interesting-actionable-sizeable bar and cut what a user would not call a problem. |
