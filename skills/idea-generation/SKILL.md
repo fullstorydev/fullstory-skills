@@ -1,166 +1,268 @@
 ---
 name: idea-generation
-description: Finds the high-impact product proposals a team has not already had, by searching the analytics objects they already built, building the ones that turn out to be missing, sizing what turns up, then pulling session replays for the finalists. Returns ranked proposals, each with what is new about it, a number against a baseline, and replay links the reader can show someone else. Use when someone asks "what should we build next", "where should we improve", "find opportunities", "what are we missing", "turn this into proposals", "what changed since the release", or wants a recurring opportunity report for a flow. Consumes settled analysis from sister Fullstory MCP skills rather than re-deriving it. For measurement use general-analysis, for comparison mechanics use comparisons, and for one session use session-review.
+description: Finds product improvement ideas a team has not already considered. Searches the metrics, segments and funnels the team already built, builds the ones that are missing, measures how many users each idea affects against a baseline, and pulls session replays as evidence. Returns 3 to 5 ranked proposals, each with what is new about it, a user count with its baseline, and replay links. Use when someone asks what to build next, how to improve a product area or flow, what the team is missing, for data-backed product ideas or proposals, or what changed after a release. If the user only wants the list of Fullstory Opportunities, call the Opportunities tools directly instead. For counts, rates and trends use general-analysis, for A vs B mechanics use comparisons, and for one session use session-review.
 ---
 
 # Idea Generation
 
-## Mental Model
+## Goal
 
-The obvious proposals are already on someone's radar. The biggest drop-off step, the top rage-click element, the noisiest error page — the team has seen those and usually already decided about them, so proposing them back costs credibility. This skill finds the proposals nobody has had yet, in three phases:
+Produce 3 to 5 product proposals that the team has not already considered. Every proposal must pass three tests:
 
-- **Find leads — cheap and broad.** Objects are the efficient layer: one call reads a definition the team already agreed on, a second computes it, and building a new one costs about the same. Most of a run happens here.
-- **Size each lead — narrow to what is worth arguing about.** A lead becomes a candidate once you know how many users it touches and what that number looks like next to a fair comparison.
-- **Support the finalists — expensive, so spend it last.** Replays explain a mechanism you have already sized. A size with no mechanism is a metric the team already has; a mechanism with no size is an anecdote.
+- **New.** It is not already on a dashboard, in the backlog, shipped, in progress, or returned by `fullstory:get_opportunities`. The obvious findings, such as the biggest funnel drop-off or the most rage-clicked element, are usually already known. Proposing them again does not help the team.
+- **Fixable by the audience.** The team receiving the proposal can fix it with a product change: UI, copy, flow, defaults, or a feature. A problem that only a backend team, an infrastructure team, or a third party can fix does not qualify. Step 1e explains how to decide who the audience is.
+- **Measurable.** You can state how many users it affects, as a count and as a share of a named total, next to the same number for a baseline group.
 
-A lead has to be **interesting, actionable and sizeable** — not already on their radar, changeable by the reader, and countable. Anything failing one of the three is an observation.
+A finding that fails any test is an observation, not a proposal. Put observations in Emerging Signals (Step 5) or drop them.
 
-**Work with the sister skills rather than redoing them.** Counts, rates and trends are `general-analysis`. Comparison mechanics are `comparisons`; this skill decides what is worth comparing. A deep single-session diagnosis is `session-review`.
+## Related Skills
 
-## Phase 1: Frame
+- `general-analysis`: how to build and compute metrics and segments.
+- `comparisons`: how to structure an A vs B comparison. This skill decides what is worth comparing.
+- `session-review`: deep diagnosis of a single session.
+- If the user only wants to see their Fullstory Opportunities, call `fullstory:get_opportunities` directly and stop. This skill treats that list as things the team already knows, not as the answer.
 
-**Name the question you are answering, in one line, before anything else.** Most asks contain several. "Improve retention" can mean *do these users convert worse*, or *does anything bring them back*, and those need different leads and produce different proposals. Pick the reading that matches what the user said, say which you picked, and note the one you set aside.
+## Workflow
 
-**A retention question is not a first-experience question.** Defects in a flow answer activation and onboarding, and fixing every one of them still gives nobody a reason to come back. If the ask is about repeat use, one lead has to be about re-entry: what pulls a user back on its own schedule, how many have it, and what the returners set up that the others never did.
+1. Frame the question and fix the definitions.
+2. Find leads. Start with existing metrics, segments and funnels, because reading them is cheap. Most of the run happens here.
+3. Measure each lead against a baseline.
+4. Pull session replays, only for the leads you plan to present.
+5. Filter, rank and write the proposals.
 
-**Ask at most two things, in one message, in your own words, and skip whatever the request already answered:**
+## Step 1: Frame the Question
 
-> Which flow or product area should I look at, and over what window?
->
-> And what do you already know here — anything on a dashboard, in the backlog, shipped recently, or in flight? I won't propose any of it back to you.
+### 1a. State the question in one sentence
 
-The second question is what makes this skill work: everything the team already knows is the baseline you have to beat. If they cannot produce it, build the list from Phase 2 and confirm it before ranking. Do not ask permission to run — pick the coverage the question deserves, run it, and report what you swept.
+Many requests contain more than one question. "Improve retention" can mean "do these users convert at a lower rate?" or "what makes users come back?" Each needs different analysis. Pick the reading that best matches the user's words, state it in one sentence, and name the reading you did not pick.
 
-**Pin these five before computing anything, and do not move them once a number exists:**
+Also name the **area** you are studying: the pages, screens or feature the question is about, such as "the checkout flow" or "the search results page". The rest of this skill calls it the area.
+
+### 1b. Retention questions need a return-visit lead
+
+Fixing problems in a flow helps subsequent users complete the flow the first time. It does not give them a reason to come back to the product. If the question is about repeat use or retention, at least one lead must be about what brings users back:
+
+1. List what the product does to prompt users to come back, instead of relying on them to remember. This depends on the product. A store might have saved searches, price-drop or back-in-stock alerts, wishlists and reminder emails. A software tool might have scheduled reports, alerts and shared links. A content site might have follows and subscriptions.
+2. Measure what share of users used at least one of them.
+3. Compare users who returned with users who did not. Check whether the users who returned used one of them more often.
+
+Look for this directly. A missing reason to return does not show up in frustration or error signals, because nothing breaks.
+
+### 1c. Ask the user at most two questions
+
+Send one message and skip any question the request already answers:
+
+1. Which flow or product area should I look at, and over what time range? If the user leaves this to you, pick the product areas with the most traffic, use the last 30 days, and state what you picked.
+2. What does the team already know here? This includes dashboards they watch, backlog items, recent releases, and work in progress. Say that you will not propose any of it back.
+
+The second question matters most, because anything the team already knows cannot count as new. If the user does not know or does not answer, build the known list yourself in Step 2 from the existing objects and from `fullstory:get_opportunities`, and list what you excluded in the output.
+
+Do not ask for permission to start or for how much to cover. Decide the scope yourself, run it, and report what you covered.
+
+### 1d. Fix five definitions before computing anything
+
+Write these down before the first compute call, and repeat them in the caveats section of the output so a reader can check them. Do not change them after you have a number.
 
 ```
-POPULATION  — who is in the cohort, by the exact filter that selects them
-OUTCOME     — the single event or page that counts as the thing happening
-WINDOW      — the date range, identical for every number in the run
-DENOMINATOR — the number is a share of what, named explicitly
-BASELINE    — who you compare against, and why they are comparable
+POPULATION   The users you are studying, as the exact filter that selects them.
+OUTCOME      The single event or page view that counts as success.
+TIME RANGE   One date range, used for every number in the run.
+DENOMINATOR  Every rate or percentage is a share of some total. Name that total.
+BASELINE     The comparison group, and why it is a fair comparison.
 ```
 
-Without this, one question asked twice produces two different rates against two different baselines, one run concluding the cohort underperforms and the other that it outperforms, with no wrong query anywhere and nothing in the output a reader could use to tell. Watch the three places it goes wrong: **the outcome** (completing an action, saving it, and coming back to repeat it are different events, so name the one you mean), **the baseline population** (the same surface and the whole org are different populations, and only the first is a fair comparison), and **the unit** (per-view and per-user are different numbers).
+If these change during a run, two runs of the same question can use different baselines and reach opposite conclusions, and nothing in the output shows that the math changed.
 
-**Note who acts on this and filter to what they can change.** A backend outage is not a design team's proposal even when it is the biggest number on the page. Infer the audience rather than asking.
+These definitions apply to the question from Step 1a. If a lead needs a different population or outcome, write that lead's definitions down before you compute it.
 
-## Phase 2: Find Leads
+The three most common mistakes:
 
-**Check what already distinguishes the cohort before building anything to select it.** Captured traffic usually separates the group you care about on its own — a URL path or parameter, a page, a device, a referrer, a custom variable. Where it does, that is the cheapest cohort in the run. Never conclude a cohort cannot be isolated before checking, and when nothing distinguishes it, say so up front, because any mechanism you then find is real for the surface and unproven for the group.
+- **Outcome.** Starting something, finishing it, and coming back to do it again are different events. For example, adding an item to a shortlist, submitting a lead form, and returning to submit another are three outcomes. Name the one you mean.
+- **Baseline.** Compare against other users of the same area, not against every user of the site or app. Everyone is a different population.
+- **Unit.** A per-page-view rate and a per-user rate are different numbers. State which one each rate uses.
 
-**Then search what the team already watches.** `fullstory:get_metric` and `fullstory:get_segment` take a name `regex`, return `total_matched`, and page with `limit` (default 10, max 25) and `offset`; `fullstory:get_managed_funnels` lists the funnels. Search the flow's vocabulary, not one guessed term. Do not pass `owned: true` — it scopes to your own objects, not the team's.
+### 1e. Decide who will act on the proposals
 
-Judge what comes back on whether it answers the question, not on whether it exists. A metric scoped wrong or a funnel missing your step is not a match. **Where nothing strong exists, build it** — `fullstory:build_funnel` across the uncovered steps, `fullstory:build_journey` around the pivot, `fullstory:build_metric` on the unmeasured event, `fullstory:build_segment` for the cohort nobody has drawn. Ask what you would need to see and make exactly that. Do not build a near-duplicate of something the search already found.
+Infer from the request who will receive the proposals, for example a design team, the product team for one area, or leadership. State your assumption. Do not ask. Keep only problems that audience can fix.
 
-**Walk the flow for steps with no object on them at all.** An unmeasured step is where nobody has proposed anything, because nobody could see it. This is often the highest-yield part of a run.
+Backend failures are a special case. The failure itself is out of scope for a product team. How the interface behaves when the backend fails is in scope, and it is often the best finding. If a request fails and the UI shows no error, keeps accepting input, or loses the user's work, that is a product fix. Only drop it if a perfectly reliable backend would leave nothing for the product team to change.
 
-Then compute and look for one of these:
+## Step 2: Find Leads
 
-| Lead | How to spot it |
+### 2a. Check whether captured data already identifies the population
+
+Before building a new segment, check whether data you already capture separates the users you care about: a URL path or query parameter, a page, a device type, a referrer, or a custom user or event property. If one does, filter on it. That is the simplest way to define the population.
+
+Do not conclude that the population cannot be isolated without checking. If nothing in the data separates it, say so at the top of the output, because your findings then cover everyone who used the area. For example, if you were asked about first-time shoppers and cannot tell them apart from repeat shoppers, your findings describe all shoppers, and you cannot say they apply to first-time shoppers in particular.
+
+### 2b. Search the objects the team already built
+
+Before building anything, search the metrics, segments and funnels the team already made, with `fullstory:get_metric`, `fullstory:get_segment` and `fullstory:get_funnel`. Search with several terms from the area, such as page names, feature names and event names, not one guess. What the team already built tells you what they already watch, which Step 1c needs.
+
+`fullstory:get_managed_funnels` lists a different family: funnels Fullstory maintains for the account. Their ids work with `fullstory:discover_groups` and the Opportunities tools, not with `fullstory:compute_funnel` or `fullstory:get_funnel_sessions`.
+
+Keep an object only if it answers your question. A metric filtered to the wrong population, or a funnel missing a step you need, is not a match.
+
+### 2c. Build what is missing
+
+If nothing from the search answers the question, build it:
+
+- `fullstory:build_funnel` for a sequence of steps nobody has measured.
+- `fullstory:build_journey` for the paths into and out of a key step.
+- `fullstory:build_metric` for an event nobody counts.
+- `fullstory:build_segment` for a group of users nobody has defined.
+
+Decide what you need to see, then build exactly that. Do not build a near copy of an object the search already found.
+
+### 2d. List steps with no measurement
+
+Go through the flow one step at a time and list every step that has no metric, segment or funnel on it. Nobody has proposed anything about these steps because nobody could see them, so they often produce the best leads. If the question covers a product area rather than one flow, do this for the two or three flows in that area with the most traffic.
+
+### 2e. Compute and look for these patterns
+
+| Pattern | How to find it |
 |---|---|
-| **A number that moved** | Compute against a prior period or by dimension. A metric that broke trend, or diverges sharply between slices, is the strongest lead there is. |
-| **A path that splits** | `fullstory:compute_journey` returns the pivot, per-step branching with each event's share of the previous step, and `popular_paths`. Users reaching one outcome by very different routes is a lead. Raise `steps` (default 4, max 10) and `per_step_limit` (default 5, rest roll into "Other") when the interesting branch is being swallowed. |
-| **Nothing brings them back** | What would return a user on their own schedule — a notification, a saved view someone else reads, a digest, a shared link — and how many have one. A surface with no return mechanism cannot retain anyone however good the first visit is, and that absence never appears as friction. |
-| **A stale or ignored object** | `fullstory:get_view_counts` takes up to 10 ids and a `days` window (default 30, max 90), `metric` and `segment` only. An object the team built and stopped opening is a solved problem or an abandoned question; the second is a lead. |
+| A number that changed | Compare against the prior period, or break it down by a dimension. A metric that broke its trend, or differs sharply between groups, is the strongest kind of lead. |
+| Paths that split | `fullstory:compute_journey` returns the pivot step, the branching at each step with each event's share of the previous step, and `popular_paths`. Users reaching the same outcome by very different routes is a lead. If the branch you care about is grouped into "Other", raise `steps` (default 4, max 10) and `per_step_limit` (default 5). |
+| No reason to return | See Step 1b. Check what exists in the area to bring users back, and what share of users used it. |
+| An object nobody opens | `fullstory:get_view_counts` takes up to 10 ids of type `metric` or `segment` and a `days` window (default 30, max 90). An object the team built and stopped opening is either a solved problem or an abandoned question. An abandoned question is a lead. |
 
-**Last, sweep for signals nobody built an object for.** `fullstory:discover_groups` returns the top frustration and error groups and takes a `scope` object where `page_ids`, `domains`, `app_names` and `url_paths` are plural and combinable, while `segment_id` and `funnel_id` are mutually exclusive with each other.
+### 2f. Sweep for problems nobody built an object for
 
-**Qualify before sizing.** Drop anything failing interesting, actionable or sizeable, then check it against the already-known list and against `fullstory:get_opportunities` — what Fullstory has already ranked is on the team's radar by definition, so it confirms and sizes rather than becoming a proposal.
+`fullstory:discover_groups` returns the top frustration and error groups. Its `scope` object accepts `page_ids`, `domains`, `app_names` and `url_paths`, which can be combined. It also accepts a `segment_id` or a `funnel_id`, but not both. Set the time range explicitly: it defaults to the last 24 hours.
 
-**Some of these tools may not be available in your org, and the signal is absence, not an error.** `fullstory:get_opportunities`, `fullstory:get_opportunity`, `fullstory:get_pages` and `fullstory:get_managed_funnels` are not present for every org. Where they are unavailable they are filtered out of the tool list entirely, so you never see them rather than get an error or an empty result. Check what you actually have before planning around them, and note that this costs you `fullstory:get_managed_funnels`, which the object search above leans on — fall back to `fullstory:get_metric` and `fullstory:get_segment` by regex plus the funnels the user names. `fullstory:discover_groups`, `fullstory:get_opportunity_stats` and `fullstory:get_sessions_for_opportunity` are always present; they compute from recorded data at call time and work wherever there is traffic, so when the others are missing these are the whole lead layer and the run loses only the pre-ranked list.
+### 2g. Check which tools you have
 
-**An empty result is a different thing from a missing tool.** If `fullstory:get_opportunities` is present and returns nothing, that is an org with nothing stored rather than an org that does not have the tool, which also silently weakens the already-known check above. Say which case you were in.
+`fullstory:get_opportunities`, `fullstory:get_opportunity`, `fullstory:get_pages` and `fullstory:get_managed_funnels` are not available in every Fullstory account. When they are unavailable they do not appear in your tool list at all. You will not get an error or an empty result. Check your tool list before planning around them.
 
-**If a cohort is defined by exclusion, validate it.** "Did not convert" leaks, because products usually offer several routes to one outcome and the segment excludes one. Sample 8 to 10 sessions and check whether the outcome happened anyway by any route; above roughly 10%, fix the definition. Exclude the confirmation the user actually *sees*, in every locale and variant, rather than one named event or element. Relaxing a scope filter for volume is fine and gets logged; relaxing the filter that *defines* the cohort changes the question and goes to the user.
+- If `fullstory:get_managed_funnels` is missing, you lose only the Fullstory-maintained funnels. The team's own funnels are still found with `fullstory:get_funnel`.
+- `fullstory:discover_groups`, `fullstory:get_opportunity_stats` and `fullstory:get_sessions_for_opportunity` are always available. They compute from recorded data at call time. When the other four tools are missing, you lose the pre-ranked Opportunities list and the page and funnel lists, and these three tools plus the metric and segment search are your whole lead sweep.
+- If `fullstory:get_opportunities` is present but returns nothing, the account has no stored Opportunities. That is different from the tool being missing, and it also means your known list is weaker. Say which case applies.
 
-## Phase 3: Size, Then Support
+### 2h. Validate any segment defined by exclusion
 
-`fullstory:get_opportunity_stats` computes fresh statistics from a `fullstory:discover_groups` tuple: `users_affected`, `session_count`, `user_percentage`, and page, device and domain breakdowns. Prefer `user_percentage_on_page` — the share of users *on that page* — over `user_percentage`, which flatters a problem on a low-traffic page. `frustration_rate_change` and `error_rate_change` compare affected users against unaffected ones, which is a contrast needing no second cohort. For a lead from a funnel or metric, size it with `fullstory:compute_funnel` or `fullstory:compute_metric` instead.
+A segment like "did not convert" often includes users who did convert. For example, a "did not book" segment that excludes users who clicked Book Now still contains users who booked from their favorites page instead. Before using a segment like this:
 
-**Every number carries its denominator and window into the output.** A number nobody can re-derive is not evidence, and one a second run would contradict is worse than none.
+1. Pull 8 to 10 sessions from the segment with `fullstory:get_sessions` and read them.
+2. Check whether the user reached the outcome anyway by any route.
+3. If more than about 10% did, fix the definition.
 
-**Then pull replays, for the leads you intend to present and nothing else.** Replay explains a mechanism you have already sized; it is not how you find one. But every proposal ships with a replay link, so a lead you will not spend replays on is a lead you will not propose. Three to five per finalist is usually enough to see a mechanism repeat. Use `fullstory:get_sessions_for_opportunity` or `fullstory:get_sessions`, keep every `session_url` verbatim, and never hand-construct one.
+Define "converted" by what every successful user reaches, such as the confirmation page or thank-you message, in every language and variant. If that is not captured, use the event closest to it, such as an order or lead-submitted event, and name the one you used. Avoid defining it by one button or link, because users who succeed another way never click it.
 
-Read each session against the same short list of questions so the returns can be tallied rather than re-read: what the user was trying to do, the timestamped path, **whether this session confirms the pattern, contradicts it, or shows a different cause**, any workaround they invented, anything no event would capture, and one concrete change. Two things keep that pass honest. **A negative is a real answer** — asked to find friction an agent will find some, so a run where every session confirms has measured the instruction rather than the product. And **name the interactions where repetition is normal** before you start, such as steppers, carousel dots, sliders and pagination, or the run reports design as breakage.
+A scope filter narrows where you look, such as a page, a device or a date range. You may loosen a scope filter to get more volume, and you must say so in the caveats. Do not loosen the filter that defines the population. That changes the question, so ask the user first.
 
-**Check the activity level before reading anything into an absent signal.** A cohort averaging a handful of clicks per session cannot produce rage clicks, dead clicks or error clicks, so zero of them is arithmetic rather than reassurance, and a silent failure produces exactly this shape. Report the interaction count alongside any claim that rests on a signal being absent.
+### 2i. Drop leads that fail the three tests
 
-**Exclude automated traffic before computing anything.** Monitoring tabs, synthetic checks and scrapers sit on a page for hours without acting and will dominate a small cohort's averages and dwell times. Check what the long sessions actually are before a handful of them carries a finding.
+Remove leads that are not new, not fixable by the audience, or not measurable. Compare the rest against the known list from Step 1c and against `fullstory:get_opportunities` results. Anything `fullstory:get_opportunities` returned is already known to the team. Use it to confirm or size a lead, not as a new proposal.
 
-**A backend failure is out of scope, but what the interface does when it fails is in scope and is often the finding.** If a request fails and the UI shows nothing, keeps accepting input, or silently loses the user's work, that is a product fix even though the trigger is not. Only skip it when a perfectly reliable backend would leave nothing to change.
+## Step 3: Measure Each Lead
 
-If a finalist's replays show a different mechanism than the number implied, that is the finding. Re-size it before ranking.
+For a lead from `fullstory:discover_groups`, pass its `default_metric_id`, `group_id` and `group_id_fallback` to `fullstory:get_opportunity_stats`, with the same scope and the same time range. It returns `users_affected`, `session_count`, `user_percentage`, and breakdowns by page, device and domain.
 
-## Phase 4: Rank and Deliver
+- To say what share of users a problem affects, use `user_percentage_on_page`: the share of people who visited that page. `user_percentage` is the share of everyone in the account, so it makes a problem on a small page look tiny.
+- For the baseline, use `frustration_rate_change` and `error_rate_change`. They already compare users who hit the problem with users on the same page who did not, so you do not need to build a second group.
 
-Four checks, run by reading your own list. Report the drop counts in caveats, not the body.
+For a lead from a funnel or metric, measure it with `fullstory:compute_funnel` or `fullstory:compute_metric`. `fullstory:compute_funnel` takes a funnel from `fullstory:build_funnel` or `fullstory:get_funnel`, not one from `fullstory:get_managed_funnels`.
 
-- **Already known.** Match every candidate against the Phase 1 list and everything `fullstory:get_opportunities` surfaced, and drop any hit. If it shipped and is still happening, name it a regression.
-- **Evidence.** Every proposal carries at least one replay link from this run, never recalled or constructed. A full proposal needs two independent sources — a computed object is one, an Opportunity or replays or a support theme or a prior run is another. Single-source patterns go to **Emerging Signals**, not the bin.
-- **Comparison.** A number with nothing beside it is not a finding. If nothing sits beside it yet, go compute a fair baseline before ranking it. Then rule out a partial window read as a trend, seasonality, a launch or ramp effect, bots, and too small a sample.
-- **Novelty.** Write the one-line *why it's new*: what this says that their metrics, dashboards and backlog do not. If the answer is nothing, it is an observation, so cut it or drop it to one line in Emerging Signals.
+Every number in the output must include its denominator and time range, so a reader can reproduce it.
 
-**Order by judgment and say why.** How many users it touches, whether it is getting worse, and how hard it looks to change. When you cannot tell whether it is worsening — a prior-period comparison is often unavailable on sparse data and frequently returns zero for every group, which is an empty window and not a collapse — drop the deltas, rank on share-of-surface and per-user consequence, and name the fallback you used. **Do not compute a composite score.** Multiplying a real user count by an invented effort weight produces false precision and hides the judgment instead of showing it.
+Before trusting any number:
 
-**Apply all of this hardest to the headline figure.** Whatever number leads the document needs its denominator, its definition and its comparison more than anything below it, and needs to appear in the body rather than only in the summary.
+- **Check whether automated traffic is in each lead.** Test scripts, monitoring tools and scrapers show up as sessions from data-center locations, many sessions repeating the same steps, sessions that last hours with almost no clicks, and Fullstory's automation flags. `fullstory:get_opportunities` accepts `exclude_bots`, and its results mark bot-driven items with `is_bot`. The metric, funnel and stats tools have no bot filter, so report automated traffic instead of claiming you removed it.
+  - For each lead, check whether automated sessions make up a meaningful part of its count or of the replays you read. If they do, say so in that proposal's Size line, with a rough share.
+  - If a lead's evidence comes mostly from automated sessions, keep it, say so in its Size line, and rank it below leads backed by real users.
+- **Check activity before trusting a missing signal.** A group that averages a few clicks per session cannot produce many rage clicks, dead clicks or error clicks, so zero of them does not mean nothing is wrong. A silent failure looks exactly like this. Report the average interaction count next to any claim that depends on a signal being absent.
+
+## Step 4: Pull Session Replays
+
+After Step 3, pick the leads you expect to present, at most five plus one or two spares, and pull replays only for those. Replays explain why a measured number looks the way it does. They are not how you find leads. Every proposal must include a replay link, so a lead you do not pull replays for cannot become a proposal.
+
+- Pull 3 to 5 sessions per lead with the tool that matches where the lead came from:
+  - `fullstory:get_sessions_for_opportunity` for a lead from `fullstory:discover_groups`. Set the time range: it defaults to the last 24 hours.
+  - `fullstory:get_funnel_sessions` for a funnel lead. Pass the 0-indexed step in `completed_step`, and `did_not_complete: true` to get the users who dropped off there.
+  - `fullstory:get_sessions_for_journey` for a journey lead. To get sessions that took a specific path, pass `nodes` as `step` and `node_id` pairs from `fullstory:compute_journey`, and add 1 to each step number: `fullstory:compute_journey` counts the first event after the pivot as step 1, while `fullstory:get_sessions_for_journey` counts the pivot itself as step 1.
+  - `fullstory:get_sessions` for a lead from a metric or segment.
+- Copy every `session_url` exactly as returned. Never write one by hand.
+
+Before reading, list the controls in the area where repeated clicking is normal, such as steppers, image carousels, sliders and pagination. Otherwise you will report normal use as a bug.
+
+For each session, record the same fields so you can count the results:
+
+- What the user was trying to do.
+- The path, with timestamps.
+- Whether the session **confirms** the pattern, **contradicts** it, or shows a **different cause**.
+- Any workaround the user invented.
+- Anything that no event would capture.
+- One concrete change that would have helped.
+
+The tally decides whether a lead survives, and it goes into the proposal, for example "4 of the 5 sessions I read show this." Contradicting sessions are a valid result. An agent told to look for a problem will usually find one. If every session confirms the pattern, check whether you picked or read the sessions looking only for confirmation.
+
+If the replays show a different cause than the number suggested, report the cause the replays show, and measure it again before ranking. If the replays show no problem, drop the lead.
+
+## Step 5: Filter, Rank and Write
+
+### 5a. Run four checks on every candidate
+
+- **Already known.** Drop anything on the Step 1c list or returned by `fullstory:get_opportunities`. If it already shipped as a fix and the problem is still happening, call it a regression.
+- **Evidence.** Every proposal needs at least one replay link from this run, and two independent sources in total. A computed metric, segment or funnel is one source. The replays you read in Step 4, an Opportunity, or a support theme or earlier analysis the user shared is another. In most runs the two sources are a computed object plus the replays. A pattern with only one source goes in Emerging Signals.
+- **Baseline.** Every number needs a comparison next to it. If there is none, compute a fair baseline before ranking. Then rule out these causes: a partial time range read as a trend, seasonality, a launch or rollout effect, bots, and a sample too small to trust.
+- **New.** Write one line on what this proposal tells the team that their metrics, dashboards and backlog do not. If you cannot, it is an observation. Cut it or move it to Emerging Signals.
+
+Put the count of candidates dropped by each check in the caveats, not in the body.
+
+### 5b. Rank by judgment and explain the order
+
+Rank by how many users it affects, whether it is getting worse, and how hard it looks to change. State the reasoning.
+
+Prior-period comparisons often return zero for every group on sparse data. That means the prior window is empty, not that the problem collapsed. When that happens, drop the change numbers, rank on the share of the area's users affected and on how badly it affects each user (for example, lost work ranks above a short delay), and say you did this.
+
+Do not compute a combined priority score. Multiplying a real user count by an estimated effort weight creates false precision and hides the judgment.
+
+The headline number needs the most care. It must have its denominator, definition and baseline, and it must appear in the body, not only in a summary.
+
+### 5c. Write each proposal in this format
 
 ```
-[Title, <= 10 words, names the change, not the problem]
-- What: the change in one sentence, specific enough to hand to someone who would build it
-- Why it's new: what this says that their metrics, dashboards and backlog do not
-- Size: users affected per period AND the baseline beside it
-- Mechanism: what is actually happening, in one or two sentences
-- Moves: the one measurable behavior, with a direction. If you cannot name one,
-  tag it DECORATION and rank it last
-- Next: what the reader does with this — validate something specific, hand it to
-  eng, or take it upward — with the rough size of the change
-- Watch: 2-3 replay links as `[label @mm:ss](session_url)`, each with one line of
-  what the reader will see
+[Title, 10 words or fewer, naming the change, not the problem]
+- What: the change in one sentence, specific enough to hand to the person who would build it
+- Why it's new: what this tells the team that their metrics, dashboards and backlog do not
+- Size: users affected in the time range, as a count and a share of a named total, AND the baseline.
+  If automated traffic is a meaningful part of the count, say roughly how much
+- Cause: what is happening, in one or two sentences
+- Moves: the one measurable behavior the change should shift, and in which direction.
+  If you cannot name one, tag it DECORATION and rank it last
+- Next: what the reader should do: validate something specific, hand it to engineering,
+  or escalate it, with a rough effort (small, medium or large)
+- Watch: 2 to 3 replay links as `[label @mm:ss](session_url)`, each with one line
+  on what the reader will see
 ```
 
-**Write for where the proposal is going.** The reader will look into it further, hand it to the people who would build it, or put it in front of someone they report to. It is finished when it survives all three without them reconstructing it.
+### 5d. Structure the output for the reader
 
-**The shape of the artifact is not the shape of the run.** These phases are how you found the answer; they are not headings. Do not walk the reader through searching, sizing and gating, do not list the objects you built, and do not give the same recommendation in a summary and again in a body. Organise around what they have to decide. Everything about how the work was done — what you swept, dropped, read or created — goes in a short caveats note or nowhere.
+The reader will do one of three things with a proposal: investigate it further, hand it to the team that would build it, or present it to their manager. It is finished when they can do all three without rebuilding your work.
 
-Present the top 3 to 5, then Emerging Signals in one line each. Fifteen ranked items is a research backlog. Save and name any object you link to; clean up the rest silently. If the team has a tracker, write there newest-first, merging a repeat finding into its existing entry rather than filing it twice.
+- Organize the output around the proposals, not around the steps you ran. Do not narrate the search, the measurement, or the checks.
+- Do not list the objects you built.
+- Give each recommendation once. Do not repeat it in a summary and again in the body.
+- Put anything about how the work was done (what you searched, dropped, read or built) in a short caveats section at the end, or leave it out.
+
+Present the top 3 to 5 proposals, then Emerging Signals as one line each.
+
+Segments you build are saved under the name you give them. Metrics you build are saved without a name, and funnels come back as unsaved drafts. The MCP has no tool to save or delete them, so when you link to a metric or funnel, say it is unsaved so the reader can save it in Fullstory if they want to keep it. Do not link to objects the proposals do not use.
 
 ## Tool Notes
 
-Verified behaviours that cost a run when missed.
+These behaviors are verified. Missing them has broken past runs.
 
-| | |
+| Topic | Behavior |
 |---|---|
-| `fullstory:discover_groups` tuple | Returns `(default_metric_id, group_id, group_id_fallback)`. Carry all three; dropping the fallback boolean silently mismatches the group. |
-| Scope consistency | `fullstory:get_opportunity_stats` and `fullstory:get_sessions_for_opportunity` both take `scope`. Pass the one you gave `fullstory:discover_groups`, or the stats describe the whole org. |
-| Percentages do not match | `discover_groups.user_pct` is a share of the scope you queried; `user_percentage_on_page` is a share of the page's traffic. Say which denominator each number uses. |
-| Which tools are always there | `fullstory:get_opportunities`, `fullstory:get_opportunity`, `fullstory:get_pages` and `fullstory:get_managed_funnels` are not present for every org, and where they are absent they are hidden from the tool list rather than erroring. `fullstory:discover_groups`, `fullstory:get_opportunity_stats` and `fullstory:get_sessions_for_opportunity` are always available. |
-| `fullstory:get_opportunities` percentages | `user_percentage` and `event_percentage` populate only on the segment-scoped path, returning zero elsewhere, and even then they are org-wide shares. Never report "0% affected". |
-| `fullstory:get_sessions_for_opportunity` defaults | `limit` 10 (max 50), window 24 hours. Set both to match the run. |
-| `dropout_at_step` | Lives in `scope`. 0 is the default and means the LAST step, a full dropout, not the first. |
-| `compare_to_previous` | `comparison_mode` picks `worsening` (default) or `improving`. Check the prior window returns non-zero before trusting any delta. |
-| `metric_ids` | Narrows `fullstory:discover_groups` to specific signals out of the nine standard ones, which stops an error-heavy surface crowding out interaction signals. |
-| Instance ids | A record's `insight_instance_id` is a different identifier than the `instance_id` you looked it up with. |
-| Drafts | Objects built through the MCP return unsaved `/create/` URLs, so save and name anything you link to. |
-
-## Common Mistakes
-
-| Mistake | Fix |
-|---------|-----|
-| Answering before naming which question you are answering | Most asks contain several. Pick one, say which, note what you set aside. |
-| Answering a retention question with a list of first-run defects | Fixing the first visit gives nobody a reason to return. Sweep for what brings users back. |
-| Computing before the five definitions are pinned | This is how one question asked twice reaches opposite conclusions. |
-| Going straight to replays | Objects are cheap and broad, replay is expensive and narrow. Replays are for the finalists. |
-| Concluding a cohort cannot be isolated without checking what already separates it | A path, parameter or property already in captured data is the cheapest cohort available. |
-| Proposing the biggest drop-off step or the top rage-click element | That is the radar. Say what is new about it, or cut it. |
-| Settling for an object that nearly fits, rebuilding one that does, or sweeping only what exists | Search first, use a real match, build what the search did not turn up — including on the steps nobody measured. |
-| Ranking by raw frequency, or by a composite score | Volume is what the dashboard already sorts by. State size, direction and effort separately. |
-| Mixing per-view with per-user, or baselining against the whole org | Name the unit on every rate. The fair baseline differs only in the thing you are studying. |
-| A proposal with no replay link | The number says how big it is; the replay is what lets the reader show someone else. |
-| Trusting a "did not convert" segment | Validate it before building on it. Exclude the confirmation the user sees, in every locale. |
-| Putting the sweep inventory or your scratch objects in the deliverable | Accounting goes in a caveats note. The body is the proposals. |
-| Reading zero frustration signals as "nothing is wrong" | On a low-activity cohort that is guaranteed by arithmetic. Report the interaction count next to the claim. |
-| Letting a monitoring tab or scraper into a small cohort | It will own the dwell times. Check the long sessions before trusting an average. |
-| A headline figure with no denominator, definition or comparison | The lead number needs these most, and needs to appear in the body, not only the summary. |
-| Assuming the Opportunity tools are there | Four of them are absent in some orgs, `fullstory:get_managed_funnels` among them, and they vanish from the tool list rather than erroring. Check what you have before planning the sweep around it. |
-| Surfacing refreshes and scroll depth as findings | Apply the interesting-actionable-sizeable bar and cut what a user would not call a problem. |
+| `fullstory:discover_groups` result | Returns `default_metric_id`, `group_id` and `group_id_fallback`. Pass all three to later calls. Dropping the `group_id_fallback` boolean silently matches the wrong group. |
+| Same scope everywhere | `fullstory:get_opportunity_stats` and `fullstory:get_sessions_for_opportunity` both take `scope`. Pass the same scope you gave `fullstory:discover_groups`, or the numbers describe every user in the account. |
+| Percentages that disagree | `user_pct` from `fullstory:discover_groups` is a share of the scope you queried. `user_percentage_on_page` is a share of that page's traffic. State which one each number is. |
+| `fullstory:get_opportunities` percentages | `user_percentage` and `event_percentage` are filled in only when you pass a segment, and return zero otherwise. Even then they are shares of every user in the account. Never report "0% affected" from them. |
+| Short default windows | `fullstory:discover_groups`, `fullstory:get_opportunity_stats` and `fullstory:get_sessions_for_opportunity` all default to the last 24 hours. Pass `relative_time_range` (for example `30d`) or `start_time` and `end_time` on every call so all numbers use the Step 1d time range. `fullstory:build_journey` defaults to the last 7 days, so pass `time_range` there too. |
+| `fullstory:get_sessions_for_opportunity` limit | `limit` defaults to 10 (max 50). |
+| `dropout_at_step` | Used with `funnel_id`, inside `scope`. The default, 0, means the last step (users who dropped out entirely), not the first step. |
+| `compare_to_previous` | A `fullstory:discover_groups` option that compares against the prior window of the same length. `comparison_mode` is `worsening` (default) or `improving`. Confirm the prior window returns non-zero values before trusting any change. |
+| `metric_ids` | Limits `fullstory:discover_groups` to specific signals out of the nine standard ones. Use it when errors crowd out click signals in the area. |
+| Instance ids | In `fullstory:get_opportunity`, the returned `insight_instance_id` is a different id from the `instance_id` you used to look it up. |
