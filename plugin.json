@@ -6,6 +6,7 @@
     "name": "Fullstory"
   },
   "homepage": "https://www.fullstory.com",
+  "privacy": "https://www.fullstory.com/legal/privacy-policy/",
   "license": "MIT",
   "keywords": [
     "analytics",

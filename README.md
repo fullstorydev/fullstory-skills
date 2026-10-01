@@ -40,3 +40,4 @@ Tools are auto-discoverable from the Fullstory MCP server once connected. Use Cl
 - [Fullstory Developer Docs](https://developer.Fullstory.com)
 - [Fullstory Support](https://help.Fullstory.com)
 - [Fullstory Homepage](https://www.Fullstory.com)
+- [Privacy Policy](https://www.fullstory.com/legal/privacy-policy/)
