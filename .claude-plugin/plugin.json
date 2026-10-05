@@ -7,7 +7,10 @@
     "name": "Fullstory"
   },
   "homepage": "https://www.fullstory.com",
+  "documentationUrl": "https://developer.fullstory.com/mcp/introduction/",
+  "supportUrl": "https://help.fullstory.com/",
   "privacyPolicyUrl": "https://www.fullstory.com/legal/privacy-policy/",
+  "termsOfServiceUrl": "https://www.fullstory.com/legal/terms-and-conditions/",
   "license": "MIT",
   "keywords": [
     "analytics",
