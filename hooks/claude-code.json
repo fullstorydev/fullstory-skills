@@ -1,0 +1,16 @@
+{
+  "description": "Keeps the session-context agent on session reads.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "^(mcp__.*|Bash|Write|Edit|NotebookEdit|WebFetch|WebSearch|Agent)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh \"${CLAUDE_PLUGIN_ROOT}/hooks/scope-session-context.sh\""
+          }
+        ]
+      }
+    ]
+  }
+}

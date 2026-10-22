@@ -11,8 +11,8 @@ Sessions answer "why", not "how many." Reach for them when:
 
 Never call `fullstory:get_session_events` directly in the main conversation. A session transcript is large, and a handful of them will crowd out everything else you're holding. Load each one in a child context instead — the Fullstory plugin ships a **`session-context`** agent for exactly this, and any subagent or task mechanism your environment offers works the same way.
 
-Give the isolated context three things:
-- `device_id` and `session_id` from the session list
+Give the isolated context two things:
+- The `session_id` (or `session_url`) from the session list, exactly as returned
 - A task describing what you want to learn
 
 It calls `fullstory:get_session_events`, answers the task, and returns just that. You synthesize across sessions in the main context, which stays small.
@@ -39,7 +39,7 @@ Each returns `matching_sessions` and `matching_users` alongside the capped list,
 ## Workflow
 
 1. Pull 3–5 sessions from the appropriate entry point above
-2. Load each in an isolated context with `device_id`, `session_id`, and a task
+2. Load each in an isolated context with its `session_id` and a task
 3. Look for patterns across the answers: same page, same element, same error, same sequence
 4. Synthesize: "Rage clicks on checkout are concentrated on the 'Apply Coupon' button — in 4 of 5 sessions users clicked it repeatedly with no visible response"
 5. Present session URLs as evidence for the conclusion, not as homework for the user

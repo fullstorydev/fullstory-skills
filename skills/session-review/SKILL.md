@@ -23,7 +23,7 @@ The tools follow this pattern:
 fullstory:session_open  →  (fullstory:session_screenshot | fullstory:session_get_a11y_tree | fullstory:session_diff)*  →  fullstory:session_close
 ```
 
-1. **`fullstory:session_open`**: Pass `session_url`. Returns event summaries and a `client_id`.
+1. **`fullstory:session_open`**: Pass the session URL or id as `session_id`. Returns event summaries and a `client_id`.
 2. **`fullstory:session_screenshot`**: Screenshot at a timestamp. Sequential calls with increasing timestamps are faster.
 3. **`fullstory:session_get_a11y_tree`**: Accessibility tree at a timestamp. Sequential calls with increasing timestamps are faster.
 4. **`fullstory:session_diff`**: Text summary of accessibility tree changes between two timestamps within a page.
@@ -33,7 +33,7 @@ fullstory:session_open  →  (fullstory:session_screenshot | fullstory:session_g
 
 ### 1. Open the Session
 ```
-fullstory:session_open(session_url="https://app.fullstory.com/ui/<org-id>/session/<device-id>:<session-id>")
+fullstory:session_open(session_id="https://app.fullstory.com/ui/<org-id>/session/<device-id>:<session-id>")
 ```
 Returns: event summaries (navigation, clicks, errors, custom events) and `client_id`.
 

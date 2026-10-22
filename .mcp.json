@@ -2,7 +2,10 @@
   "mcpServers": {
     "fullstory": {
       "type": "http",
-      "url": "https://api.fullstory.com/mcp/fullstory"
+      "url": "https://api.fullstory.com/mcp/fullstory",
+      "oauth": {
+        "scopes": "playback:read search:read search.metadata:read sessions:read users.metadata:read users:list metrics:read metrics.funnel:read metrics.page:read library.objects:read library.spaces:read playback.spec:read playback.page.definitions:read specs.mappings:read settings.own:read settings.own:write"
+      }
     }
   }
 }

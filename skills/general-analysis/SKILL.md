@@ -118,6 +118,8 @@ Present in plain language with context:
 
 Always surface the object URL (`metric_url`, `funnel_url`, `journey_url`, `segment_url`) so the user can verify in the Fullstory UI. Surface it as soon as a build or update returns it — don't wait for the compute.
 
+Metrics and funnels you build are unsaved drafts (their URLs contain `/create/`), and the MCP has no tool to save them. Call them unsaved when you link them, never "saved", so the user knows to save them in Fullstory if they want to keep them. Segments you build are saved under the name you give them.
+
 ## References
 
 Load these when the situation calls for it:
