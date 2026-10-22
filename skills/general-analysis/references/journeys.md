@@ -35,7 +35,7 @@ So before interpreting anything, read `pivots[].label` in the `fullstory:compute
 
 Override for this compute only, without touching the saved journey: `time_range` / `start_date` + `end_date`, `direction`, `steps` (fan-out depth, default 4, max 10), and `per_step_limit` (distinct events per step before the rest roll into an "Other" bucket, default 5). Raising `per_step_limit` is the fix when "Other" is swallowing most of a step; raising `steps` is how you follow a path further out.
 
-**Known bug — `popular_paths[].count` is unreliable for `direction="end"` journeys (DXA-4835).** The count is read from the last node of each path, which is correct walking forward from the pivot but not walking backward to it. On an end-direction journey, use `completion_rate` and the `steps` tree for magnitude, and treat the path *ordering* as directional rather than the raw counts. Say so if a user asks about those numbers specifically. Start-direction journeys are unaffected.
+**Known bug — `popular_paths[].count` is unreliable for `direction="end"` journeys.** The count is read from the last node of each path, which is correct walking forward from the pivot but not walking backward to it. On an end-direction journey, use `completion_rate` and the `steps` tree for magnitude, and treat the path *ordering* as directional rather than the raw counts. Say so if a user asks about those numbers specifically. Start-direction journeys are unaffected.
 
 ### Refine
 
