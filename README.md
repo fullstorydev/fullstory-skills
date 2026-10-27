@@ -35,6 +35,16 @@ Available tools are auto-discoverable once the server is connected. See the [Ful
 
 Tools are auto-discoverable from the Fullstory MCP server once connected. Use Claude to list available tools or refer to the [Fullstory Developer Documentation](https://developer.Fullstory.com) for the full API reference.
 
+## Community Plugins
+
+The community is building on the Fullstory MCP — here are projects worth checking out:
+
+| Project | Description |
+|---------|-------------|
+| [fullstory-reatlat](https://github.com/reatlat/fullstory-claude-plugin) | 46 skills + 3 isolated-context agents covering analytics, debugging, funnels, journeys, session replay, and report generation — the largest Fullstory skill collection |
+
+Built something on the Fullstory MCP? Open a PR and add it here — we'd love to see what you're working on.
+
 ## Support
 
 - [Fullstory Developer Docs](https://developer.Fullstory.com)
