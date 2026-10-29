@@ -79,7 +79,7 @@ Rule out the first two before calling a zero good news.
 
 **Rage clicks fire on rapid repeated clicks in one spot, and some controls are built for exactly that:** pagination arrows, quantity steppers, carousel dots. Whether the element is broken is the next check.
 
-**A dead click only matters on something that looks clickable.** Open a session, call `fullstory:session_get_a11y_tree` at the time of the click, and read the role: a `button` or `link` that did nothing is a finding, plain text or a container is not. An element named for a whole screen or card absorbs every click inside it, so confirm in replay what was hit.
+**A dead click only matters on something that looks clickable.** Open the session, look at the element structure at the time of the click (see the `session-review` skill for which tools do that), and read the role: a `button` or `link` that did nothing is a finding, plain text or a container is not. An element named for a whole screen or card absorbs every click inside it, so confirm in replay what was hit.
 
 **Get the element's total clicks before calling a dead-click count high or low.** Thirteen out of 50 is a problem; thirteen out of 13,000 is not.
 
@@ -129,7 +129,7 @@ Pull 2 to 3 sessions per finding with `fullstory:get_sessions_for_opportunity`, 
 
 Pull more than you need and replace any session that turns out to be a different problem, automated, or an unrelated exit. Never count one you dropped.
 
-Events don't show the screen; for any claim about what a user saw, call `fullstory:session_open`, `fullstory:session_screenshot` at that moment, then `fullstory:session_close`. Two identical screenshots from different times mean the tool returned the wrong frame; fall back to event order and say so. Before recommending an error message, check whether one already appears.
+Events don't show the screen; for any claim about what a user saw, open the session, look at the screen at that moment, then close the session. The `session-review` skill says which tools do each step. Two identical screenshots from different times mean the tool returned the wrong frame; fall back to event order and say so. Before recommending an error message, check whether one already appears.
 
 ### Check the group is big enough to report
 
