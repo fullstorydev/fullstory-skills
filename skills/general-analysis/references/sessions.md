@@ -48,4 +48,14 @@ Start with 3–5. If the pattern is clear, stop. If it isn't, pull more — isol
 
 ## Watching what the user saw
 
-When the question is visual — "did the error banner actually render?", "what did the cart look like when they abandoned?" — the event transcript won't answer it. That's the `session-review` skill's territory: `fullstory:session_open` → `fullstory:session_screenshot` / `fullstory:session_get_a11y_tree` / `fullstory:session_diff` → `fullstory:session_close`. Always close what you open, including when something errors partway through; the handle holds server-side state.
+When the question is visual — "did the error banner actually render?", "what did the cart look like when they abandoned?" — the event transcript won't answer it. That's the `session-review` skill's territory:
+
+| Goal | Tool |
+|---|---|
+| Open a session | `fullstory:review-open` |
+| See what happened in a time window | `fullstory:review-zoom` |
+| See the screen at a moment | `fullstory:review-snapshot` |
+| See what changed on screen | `fullstory:review-snapshot` at two timestamps, compare the trees |
+| Close | `fullstory:review-close` |
+
+Always close what you open, including when something errors partway through; the handle holds server-side state.

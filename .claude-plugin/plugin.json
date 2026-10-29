@@ -1,13 +1,19 @@
 {
   "name": "fullstory",
   "displayName": "Fullstory",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Connect Claude to Fullstory to query behavioral analytics, session replays, and customer experience insights.",
   "author": {
-    "name": "Fullstory"
+    "name": "Fullstory",
+    "url": "https://www.fullstory.com"
   },
   "homepage": "https://www.fullstory.com",
+  "repository": "https://github.com/fullstorydev/fullstory-skills",
+  "documentationUrl": "https://developer.fullstory.com/mcp/introduction/",
+  "supportUrl": "https://help.fullstory.com/",
   "privacyPolicyUrl": "https://www.fullstory.com/legal/privacy-policy/",
+  "termsOfServiceUrl": "https://www.fullstory.com/legal/terms-and-conditions/",
+  "icon": "./assets/icon.svg",
   "license": "MIT",
   "keywords": [
     "analytics",
