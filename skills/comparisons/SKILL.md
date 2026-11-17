@@ -22,9 +22,15 @@ To refine an established comparison metric (e.g., "add a Chrome-only filter"), p
 
 Properties that describe a user rather than an event should use segments. The key mechanism: Fullstory resolves user properties to the user's **last known value** for that key. This canonical value is what segment queries match against — so you're asking "what bucket is this user in now?", not "what was their value at the moment of each event?".
 
-Built-in user properties that work this way: `signed_up` (signed-up status), `first_seen` / `last_seen` (dates), `total_sessions` (engagement depth), and any custom user properties (`user_var_string`, `user_var_int`, etc.) set via `setUserProperties` — e.g. plan type or account ID. Build one metric and one segment per cohort, then compute each cohort in sequence: attach the segment via `fullstory:update_metric(metric_id, segment_id)`, call `fullstory:compute_metric(metric_id)`, store the result, then repeat with the next segment. Present the results side by side. The cohort segments are saved; the metrics are unsaved drafts, so say so when you link them. Do not pass `segment_id` directly to `fullstory:compute_metric`.
+Built-in user properties that work this way: `signed_up` (signed-up status), `first_seen` / `last_seen` (dates), `total_sessions` (engagement depth), and any custom user properties (`user_var_string`, `user_var_int`, etc.) set via `setUserProperties` — e.g. plan type or account ID. Build one segment per cohort, then pick the shape the question needs:
 
-Example: "do enterprise users experience more errors than free users?" → build two segments (enterprise, free), build one metric (errors), compute twice.
+- **Totals** ("how many", "which cohort has more"): one metric per cohort. Build the metric with one cohort in `segment_ids`, or attach each cohort to a base metric with `fullstory:update_metric`(metric_id, segment_ids=[cohort]), and compute each. A trend's daily numbers do not add up to a total of unique users, because a user active on 3 days counts 3 times.
+- **Over time** ("how does it change week to week", "show them on one chart"): one trend that holds every cohort. Pass all the segments in `segment_ids`; one `fullstory:compute_metric` call returns a `segments` list, one labeled entry per cohort. Several segments need a trend with no group-by, and most orgs allow up to 5.
+- **Example sessions:** one cohort at a time, from that cohort's own metric or `fullstory:get_sessions`(segment_id). Never pass a metric that holds several segments to `fullstory:get_sessions`: it would only match users in every cohort at once, so the call is refused.
+
+Present the results side by side. The cohort segments are saved; the metrics are unsaved drafts, so say so when you link them. `fullstory:compute_metric` takes no segments of its own.
+
+Example: "do enterprise users experience more errors than free users?" → build two segments (enterprise, free), build one errors metric per cohort, compute each, and compare the totals.
 
 To refine a cohort after it's been built (e.g., "also exclude trial users from the free segment"), use `fullstory:update_segment` with the existing `segment_definition` rather than rebuilding with `fullstory:build_segment`.
 

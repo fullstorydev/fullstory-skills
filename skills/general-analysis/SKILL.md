@@ -55,7 +55,7 @@ Two rules that hold across every tool here:
 | "mobile vs desktop", "A vs B", "compare" | the `comparisons` skill |
 | "where do users drop off", "conversion through X → Y → Z", "how long does it take to complete" | funnel → `references/funnels.md` |
 | "what do users do after X", "what led to Y", "where do they go next" | journey → `references/journeys.md` |
-| "show me sessions", "let me watch some examples" | `fullstory:get_sessions` with `metric_id` or `segment_id` |
+| "show me sessions", "let me watch some examples" | `fullstory:get_sessions` with `metric_id` or `segment_id`, one cohort at a time |
 | "why is this happening" | compute first, then `references/sessions.md` |
 
 **Scope is part of the question.** A request like "how's checkout doing?" or "where are users struggling?" has no defined boundary, and every boundary you pick silently produces a different answer. When the scope genuinely isn't recoverable from the conversation, ask once, concretely — which pages or flows matter, which users count, what time window — and offer a reasonable default so the user can just say "yes". Don't interrogate: if the request names its own scope, or the default is obvious, build and move on.
@@ -81,9 +81,9 @@ Call `fullstory:build_metric` with a descriptive `query` and the `output_type` f
 
 - **Pass the user's phrasing through.** Rates ("bounce rate", "conversion rate", "error rate") must stay as rate phrasing — simplifying "error rate" to "error count" drops the denominator and produces a different, wrong number. Same for comparison phrasing ("vs last week", "week over week"): pass it verbatim and you get one metric covering both windows, rather than two metrics you have to reconcile by hand.
 - **Get the unit of measurement right** before building — it's the most common source of misleading results. If the question is about "customers", "accounts", or "organizations", clarify whether that means individual users or users grouped by an account property, and build accordingly.
-- **Exclusions need a segment.** `fullstory:build_metric` cannot express "excluding users who…" or "users who did NOT do X" — the filter tree has no negation. Call `fullstory:build_segment` with the negation phrasing verbatim, then pass the returned `segment_id` to `fullstory:build_metric(segment_id=...)`. Putting the exclusion in the query text gets it silently dropped or misread as a positive filter.
+- **Exclusions need a segment.** `fullstory:build_metric` cannot express "excluding users who…" or "users who did NOT do X" — the filter tree has no negation. Call `fullstory:build_segment` with the negation phrasing verbatim, then pass the returned id to `fullstory:build_metric(segment_ids=[...])`. Putting the exclusion in the query text gets it silently dropped or misread as a positive filter.
 - **Simple user-property filters don't need a segment.** "unique users on app.example.com where email does not contain @example.com" goes straight into the query. Reach for a segment when you need segment semantics: a behavioral cohort ("users who did X"), a saved/named cohort, or several cohorts to compare.
-- **Scoping to a cohort at build time:** `fullstory:build_metric` accepts `segment_id` directly. For a metric that already exists, attach with `fullstory:update_metric(metric_id, segment_id)` first and compute the returned id. `fullstory:compute_metric` does **not** take a `segment_id`.
+- **Scoping to a cohort at build time:** `fullstory:build_metric` accepts `segment_ids` directly. For a metric that already exists, attach with `fullstory:update_metric(metric_id, segment_ids)` first and compute the returned id. `fullstory:compute_metric` does **not** take segments. To compare cohorts, pass them all in `segment_ids` and read the `segments` list that `fullstory:compute_metric` returns.
 
 Segments: call `fullstory:build_segment` and reference by `segment_id` afterward. Reuse a `segment_id` across questions in the same conversation rather than rebuilding it.
 
@@ -133,7 +133,7 @@ Load these when the situation calls for it:
 ## Guidelines
 
 - Default `time_range` is `last_30_days` (`last_7_days` for journeys). Ask before using a different window unless the user specified one.
-- An invalid `time_range` is a hard error, not a silent fallback. Use the enum values, or pass `start_date` + `end_date` together as ISO 8601 (dates or full timestamps) for anything else — "this week", "yesterday", and "since the release" need concrete dates.
+- An invalid `time_range` is a hard error, not a silent fallback. Use the enum values, or pass `start_date` + `end_date` together as ISO 8601 (dates or full timestamps) for anything else — "this week" and "since the release" need concrete dates (`today` and `yesterday` are presets).
 - Reuse `segment_id`, `metric_id`, `funnel_id`, and `journey_id` within a conversation. Don't rebuild what the user has already established.
 - To reshape an existing metric (a count they now want as a trend), use `fullstory:update_metric` with the existing `metric_id` and the new `output_type`. Fall back to `fullstory:build_metric` only for a fundamentally different question or a ratio metric.
 - If `fullstory:build_multi_metric` is available in this session, prefer it over `fullstory:build_metric` — it handles several measures and formulas in one object, and can build anything `fullstory:build_metric` can.

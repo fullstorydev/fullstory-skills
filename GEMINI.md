@@ -10,7 +10,7 @@ This extension connects **Gemini CLI** to the Fullstory MCP server.
 ## Bundled capabilities
 
 - **Skills** (under `skills/`): `general-analysis`, `comparisons`, `friction-analysis`, `session-review` and `idea-generation`. Use them for quantitative analytics, A vs B comparisons, finding where users struggle, diagnosing a single session, and sizing improvement ideas.
-- **Sub-agent** (`agents/session-context.md`): load a single session’s event transcript in isolation when investigating session details.
+- **Sub-agent** (`agents/session-context.md`): review a single session in isolation when investigating session details.
 
 Tool names in Gemini CLI follow `mcp_<server-alias>_<toolName>` (for example, `mcp_Fullstory_get_session_events` when the MCP server key is `Fullstory`).
 
