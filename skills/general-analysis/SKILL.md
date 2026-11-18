@@ -133,8 +133,8 @@ Load these when the situation calls for it:
 ## Guidelines
 
 - Default `time_range` is `last_30_days` (`last_7_days` for journeys). Ask before using a different window unless the user specified one.
-- An invalid `time_range` is a hard error, not a silent fallback. Use the enum values, or pass `start_date` + `end_date` together as ISO 8601 (dates or full timestamps) for anything else — "this week" and "since the release" need concrete dates (`today` and `yesterday` are presets).
+- An invalid `time_range` is a hard error, not a silent fallback. Use the enum values, or ISO 8601 dates (or full timestamps) for anything else: `start_date` alone runs through today ("since the release"), `start_date` + `end_date` is a fixed range, and `end_date` alone is an error. Don't also pass `time_range` with a lone `start_date`: the preset wins and the date is ignored. "This week" needs a concrete start date (`today` and `yesterday` are presets).
 - Reuse `segment_id`, `metric_id`, `funnel_id`, and `journey_id` within a conversation. Don't rebuild what the user has already established.
 - To reshape an existing metric (a count they now want as a trend), use `fullstory:update_metric` with the existing `metric_id` and the new `output_type`. Fall back to `fullstory:build_metric` only for a fundamentally different question or a ratio metric.
-- If `fullstory:build_multi_metric` is available in this session, prefer it over `fullstory:build_metric` — it handles several measures and formulas in one object, and can build anything `fullstory:build_metric` can.
+- If `fullstory:build_multi_metric` is available in this session, prefer it over `fullstory:build_metric` — it handles several measures and formulas in one object, and can build anything `fullstory:build_metric` can. It takes one `segment_id`. Several cohorts on one chart need one visible measure: use `fullstory:build_metric` with `segment_ids`, or `fullstory:update_metric` with `segment_ids` on a metric that keeps one measure visible.
 - Every number you report should come from a compute or read tool. Don't derive a figure by arithmetic on results that measure different populations, and don't estimate one.
