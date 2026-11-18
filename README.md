@@ -96,7 +96,7 @@ You get a step-by-step account of what the user did, the moment it went wrong, a
 
 You get 3 to 5 ranked proposals, each with how many users it affects and replay links you can share.
 
-The **session-context** agent reads a session's full event log in its own context window, so long transcripts don't crowd out your main conversation. The other skills use it automatically.
+The **session-context** agent reviews a session in its own context window, so session data doesn't crowd out your main conversation. The other skills use it automatically.
 
 ## What it can and can't do
 

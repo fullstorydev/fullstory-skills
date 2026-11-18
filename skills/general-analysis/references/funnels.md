@@ -18,7 +18,7 @@ fullstory:build_funnel  →  (confirm)  →  fullstory:compute_funnel  →  full
 - `within_seconds` — the whole funnel must complete in this many seconds ("within 5 minutes" → 300). Pass `0` to strip a window the query implied; omit to keep it.
 - `in_same_session=false` — for flows that span sessions.
 - `time_range` — defaults to `last_30_days`.
-- `segment_id` — bakes a cohort into the definition. Prefer scoping at compute time instead (see below); the exception is an **exclusion** ("excluding users who already subscribed"), which `fullstory:build_funnel` cannot express in the query at all — build the exclusion with `fullstory:build_segment` first and pass its id here or to `fullstory:compute_funnel`.
+- `segment_ids` — bakes cohorts into the definition, up to 4. Prefer scoping at compute time instead (see below); the exception is an **exclusion** ("excluding users who already subscribed"), which `fullstory:build_funnel` cannot express in the query at all — build the exclusion with `fullstory:build_segment` first and pass its id here or to `fullstory:compute_funnel`. `segment_id` (one id) still works but is deprecated.
 
 ### Confirm before computing
 
@@ -26,7 +26,7 @@ Read `funnel_definition` / the funnel description and check the step order, the 
 
 ### Compute
 
-`fullstory:compute_funnel(funnel_id)` returns per-step:
+`fullstory:compute_funnel(funnel_id)` computes the funnel for the segments saved on it, or for everyone when it has none, and returns per-step:
 
 - `user_count` — users or sessions reaching that step
 - `conversion_from_previous` and `conversion_from_first` — percentages (0–100); both omitted for step 1, which is the entry point and has only a count
@@ -34,15 +34,17 @@ Read `funnel_definition` / the funnel description and check the step order, the 
 
 Three optional arguments do a lot of work:
 
-- **`segment_id`** — scope the result to a population. This is the right way to answer "how does this funnel convert for enterprise users?", because the same saved funnel can be computed against several cohorts without rebuilding, which also keeps the comparison honest — identical steps, different population.
+- **`segment_ids`** — compute for these populations instead of the saved ones, up to 4. This is the right way to answer "how does this funnel convert for enterprise users?", because the same saved funnel can be computed against several cohorts without rebuilding, which also keeps the comparison honest — identical steps, different population. With several segments the result holds `segments` instead of `steps`: one labeled entry per segment, each with its own steps. Each segment is computed on its own, so the numbers compare cohorts rather than intersect them.
 - **`compare_to`** (`previous_day` / `previous_week` / `previous_month` / `previous_quarter` / `previous_year`) — each step gains a `previous` object with the same fields over the earlier window.
 - **`dimension`** — `{property: "browser"}` and each step gains a `groups` array with per-group counts and conversion. Use `apply_to_steps: [0]` to break down only the entry step. Custom-var dimensions (`page_var`, `elem_var`, `user_var`, `event_var`) also need `field_name`.
+
+`compare_to` and `dimension` take one segment at most. With several segments, sent or saved on the funnel, they are refused: pass the one cohort you want in `segment_ids`.
 
 The funnel's **saved** time range is always used — `fullstory:compute_funnel` has no time-range override. To change the window, use `fullstory:update_funnel(funnel_id, time_range=...)`, which is cheaper and safer than rebuilding because it copies the steps verbatim instead of re-translating them.
 
 ### Refine
 
-`fullstory:update_funnel` changes the time window, aggregation, `within_seconds`, `in_same_session`, and/or the steps themselves (via a natural-language `refinement` like "add a step for clicking Checkout after the cart page"). It returns a **new** `funnel_id` and leaves the original alone — compute the new id, not the old one. A funnel always keeps at least 2 steps.
+`fullstory:update_funnel` changes the time window, aggregation, `within_seconds`, `in_same_session`, the saved segments (`segment_ids`, which replaces them), and/or the steps themselves (via a natural-language `refinement` like "add a step for clicking Checkout after the cart page"). It returns a **new** `funnel_id` and leaves the original alone — compute the new id, not the old one. A funnel always keeps at least 2 steps.
 
 ### Sessions
 

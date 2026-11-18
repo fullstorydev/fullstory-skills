@@ -7,15 +7,15 @@ Sessions answer "why", not "how many." Reach for them when:
 - A journey shows a branch nobody expected
 - You need to confirm or kill a hypothesis about what's driving a number
 
-## Read sessions in an isolated context
+## Review sessions in an isolated context
 
-Never call `fullstory:get_session_events` directly in the main conversation. A session transcript is large, and a handful of them will crowd out everything else you're holding. Load each one in a child context instead — the Fullstory plugin ships a **`session-context`** agent for exactly this, and any subagent or task mechanism your environment offers works the same way.
+Don't review sessions directly in the main conversation. Session data is large, and a handful of sessions will crowd out everything else you're holding. Review each one in a child context instead. The Fullstory plugin ships a **`session-context`** agent for exactly this, and any subagent or task mechanism your environment offers works the same way.
 
 Give the isolated context two things:
-- The `session_id` (or `session_url`) from the session list, exactly as returned
+- The `session_url` from the session list, exactly as returned
 - A task describing what you want to learn
 
-It calls `fullstory:get_session_events`, answers the task, and returns just that. You synthesize across sessions in the main context, which stays small.
+It reviews the session with `fullstory:review-open`, `fullstory:review-zoom`, `fullstory:review-snapshot` and `fullstory:review-close`. It falls back to `fullstory:get_session_events` for plain console error text, or when the review tools are missing or fail. It answers the task and returns just that. You synthesize across sessions in the main context, which stays small.
 
 **More specific tasks get more useful answers.** When you have a hypothesis, tie the task to it:
 
@@ -29,8 +29,8 @@ It calls `fullstory:get_session_events`, answers the task, and returns just that
 
 | Starting point | Call |
 |---|---|
-| A metric | `fullstory:get_sessions(metric_id)` |
-| A cohort | `fullstory:get_sessions(segment_id)` |
+| A metric | `fullstory:get_sessions(metric_id)`, for a metric with at most one segment |
+| A cohort | `fullstory:get_sessions(segment_id)`, one cohort at a time. Use this for each cohort of a metric that compares several. |
 | A funnel step, or the people who dropped at it | `fullstory:get_funnel_sessions(funnel_id, completed_step=N[, did_not_complete=true])` |
 | A journey branch | `fullstory:get_sessions_for_journey(journey_id[, nodes=[...]])` |
 
@@ -39,7 +39,7 @@ Each returns `matching_sessions` and `matching_users` alongside the capped list,
 ## Workflow
 
 1. Pull 3–5 sessions from the appropriate entry point above
-2. Load each in an isolated context with its `session_id` and a task
+2. Review each in an isolated context with its `session_url` and a task
 3. Look for patterns across the answers: same page, same element, same error, same sequence
 4. Synthesize: "Rage clicks on checkout are concentrated on the 'Apply Coupon' button — in 4 of 5 sessions users clicked it repeatedly with no visible response"
 5. Present session URLs as evidence for the conclusion, not as homework for the user
@@ -48,7 +48,7 @@ Start with 3–5. If the pattern is clear, stop. If it isn't, pull more — isol
 
 ## Watching what the user saw
 
-When the question is visual — "did the error banner actually render?", "what did the cart look like when they abandoned?" — the event transcript won't answer it. That's the `session-review` skill's territory:
+When the question is visual, like "did the error banner actually render?" or "what did the cart look like when they abandoned?", say so in the task. The isolated context snapshots the screen at the moments that matter. If your environment has no subagent or task mechanism, review the session yourself with the `session-review` skill's tools:
 
 | Goal | Tool |
 |---|---|
