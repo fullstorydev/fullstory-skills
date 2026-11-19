@@ -57,6 +57,7 @@ Two rules that hold across every tool here:
 | "what do users do after X", "what led to Y", "where do they go next" | journey → `references/journeys.md` |
 | "show me sessions", "let me watch some examples" | `fullstory:get_sessions` with `metric_id` or `segment_id`, one cohort at a time |
 | "why is this happening" | compute first, then `references/sessions.md` |
+| a dashboard by name, "how is my X dashboard doing", "what changed on our KPIs", "build a dashboard for X" | `references/dashboards.md` |
 
 **Scope is part of the question.** A request like "how's checkout doing?" or "where are users struggling?" has no defined boundary, and every boundary you pick silently produces a different answer. When the scope genuinely isn't recoverable from the conversation, ask once, concretely — which pages or flows matter, which users count, what time window — and offer a reasonable default so the user can just say "yes". Don't interrogate: if the request names its own scope, or the default is obvious, build and move on.
 
@@ -66,6 +67,7 @@ Users often don't know what already exists in their Fullstory account. Search fi
 
 - Metrics and segments: `fullstory:get_metric(regex=...)`, `fullstory:get_segment(regex=...)`
 - Funnels and journeys: `fullstory:get_funnel(regex=...)`, `fullstory:get_journey(regex=...)`
+- Dashboards: `fullstory:get_dashboard(regex=...)`. A dashboard shows which metrics and funnels the team actually watches, and its cards are ids you can compute directly. A segment in `fullstory:compute_dashboard` `filters` replaces each card's own segment, so cards that differ only by segment come back identical; to cut a segmented card by a second population, keep its segment and filter the events instead. More in `references/dashboards.md`.
 
 Start broad, then narrow (for "rage clicks on checkout", try `checkout` before `checkout.*rage`). Results carry a rendered description of the filters, steps, or pivot — judge relevance from that, not from the name, which is often auto-generated and misleading.
 
@@ -129,6 +131,7 @@ Load these when the situation calls for it:
 - `references/journeys.md` — what users do before or after one anchor event
 - `references/validation.md` — when a result is zero, anomalous, implausible, or the user is skeptical
 - `references/sessions.md` — investigating sessions to explain a number
+- `references/dashboards.md` — reading, computing, or building a dashboard
 
 ## Guidelines
 
