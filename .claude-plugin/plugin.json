@@ -1,7 +1,7 @@
 {
   "name": "fullstory",
   "displayName": "Fullstory",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Connect Claude to Fullstory to query behavioral analytics, session replays, and customer experience insights.",
   "author": {
     "name": "Fullstory",
